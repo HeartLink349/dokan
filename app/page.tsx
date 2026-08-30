@@ -25,6 +25,8 @@ export default function Home() {
   const queuePreview = game.queue.slice(game.queueIndex, game.queueIndex + 3).map((id) => DAY_ONE_CUSTOMERS.find((customer) => customer.id === id)).filter(Boolean);
   const currentNet = netProfit(game.metrics);
   const lowStockProducts = game.products.filter((product) => dokan.lowStockIds.includes(product.id));
+  const hasStock = game.products.some((product) => product.stock > 0);
+  const customerFinished = Boolean(current && ['SATISFIED', 'LEAVING', 'ANGRY'].includes(current.state));
 
   useEffect(() => {
     const dismiss = (event: KeyboardEvent) => { if (event.key === 'Escape') setModal(null); };
@@ -37,7 +39,7 @@ export default function Home() {
       <div className="brand-lockup"><span className="brand-store">د</span><div><strong>دكان الحارة</strong><small>محاكاة بقالة مصرية • اليوم الأول</small></div></div>
       <div className="stat-strip" aria-label="إحصاءات اليوم">
         <Stat icon="👥" label="الزبائن" value={`${progress}/${game.metrics.totalCustomers}`} />
-        <Stat icon="💵" label="السيولة" value={`${format(game.money)} ج`} />
+        <Stat icon="💵" label={game.phase === 'intro' ? 'رأس المال' : 'السيولة'} value={`${format(game.money)} ج`} />
         <Stat icon="📈" label="صافي الربح" value={`${format(currentNet)} ج`} tone={currentNet >= 0 ? 'good' : 'bad'} />
         <Stat icon="⭐" label="السمعة" value={`${game.reputation}/100`} tone={game.reputation > 66 ? 'good' : undefined} />
       </div>
@@ -77,21 +79,16 @@ export default function Home() {
           {current && <div className={`customer-actor ${current.state.toLowerCase()}`}><span>{current.avatar}</span><b>{current.name}</b></div>}
           {game.phase === 'playing' && queuePreview.length > 0 && <div className="scene-queue" aria-label="زبائن في انتظار دورهم"><small>في الانتظار</small><div>{queuePreview.slice(0, 2).map((customer, index) => customer && <span key={customer.id} className={`queue-actor queue-${index}`} title={`${customer.name} — ${customer.kind}`}>{customer.avatar}</span>)}</div></div>}
           <div className="scene-status"><span className={game.phase === 'playing' ? 'open-dot' : 'closed-dot'} />{game.phase === 'playing' ? 'المحل مفتوح' : game.phase === 'results' ? 'أُغلق المحل' : 'في انتظار فتح المحل'}</div>
-          {current && <div className="dialogue-bubble"><small>{current.name} • {current.kind} • {stateLabel[current.state]}</small><p>{current.message}</p></div>}
+          {current && <div className="dialogue-bubble"><small>{current.name} • {current.kind} • {stateLabel[current.state]}</small><div className="dialogue-body"><p>{current.message}</p>{customerFinished && <button className="dialogue-next" onClick={dokan.next}>التالي ←</button>}</div></div>}
           {!current && game.phase === 'playing' && <div className="scene-message">باب الدكان مفتوح… الزبون التالي في الطريق.</div>}
-          {game.phase === 'intro' && <div className="opening-prompt"><span>🏪</span><h2>صباح جديد في الحارة</h2><p>جهّز المخزون، واستقبل 37 شخصية مختلفة اليوم.</p><button className="primary large" onClick={dokan.open}>افتح الدكان</button></div>}
+          {game.phase === 'intro' && <div className="opening-prompt"><span>💵</span><h2>رأس مال البداية: {format(GAME_CONFIG.initialCapital)} ج</h2><p>الرفوف فاضية. اختَر منتجاتك بعناية قبل استقبال زباين الحارة.</p><div className="opening-actions"><button className="secondary-start" onClick={() => setModal('inventory')}>🛒 جهّز المخزون</button><button className="primary large" onClick={dokan.open} disabled={!hasStock}>افتح الدكان</button></div></div>}
         </div>
-        <section className="inventory-dock surface">
-          <div className="section-title"><div><h2>🛒 رفوف الدكان</h2><small>توريد سريع: +{GAME_CONFIG.restockAmount} وحدات بسعر التكلفة</small></div><button className="text-button" onClick={() => setModal('inventory')}>إدارة الكل ←</button></div>
-          {lowStockProducts.length > 0 && <div className="stock-radar" role="status"><span>⚠️ مخزون منخفض:</span><div>{lowStockProducts.slice(0, 3).map((product) => <button key={product.id} onClick={() => dokan.restock(product.id)}>{product.icon} {product.name} ({product.stock})</button>)}</div></div>}
-          <div className="product-grid">{game.products.map((product) => <ProductTile key={product.id} product={product} money={game.money} low={dokan.lowStockIds.includes(product.id)} onRestock={dokan.restock} />)}</div>
-        </section>
       </section>
 
       <aside className="right-rail">
         <section className="surface customer-panel">
           <div className="section-title"><h2>🧾 الكاشير</h2>{current && <span className={`state-pill ${current.state.toLowerCase()}`}>{stateLabel[current.state]}</span>}</div>
-          {current ? <CustomerCheckout current={current} products={game.products} quote={quote} selected={dokan.selectedPrice} setSelected={dokan.setSelectedPrice} onChoose={dokan.choosePrice} onNegotiate={dokan.negotiate} onLeave={dokan.leave} onRestock={dokan.restock} /> : <EmptyCheckout phase={game.phase} onClose={dokan.closeDay} />}
+          {current ? <CustomerCheckout current={current} products={game.products} quote={quote} selected={dokan.selectedPrice} setSelected={dokan.setSelectedPrice} onChoose={dokan.choosePrice} onNegotiate={dokan.negotiate} onLeave={dokan.leave} onRestock={dokan.restock} onNext={dokan.next} /> : <EmptyCheckout phase={game.phase} onClose={dokan.closeDay} />}
         </section>
         <section className="surface feedback-card">
           <div className="section-title"><h2>✨ قراءة المحل</h2></div>
@@ -102,8 +99,14 @@ export default function Home() {
         </section>
         <p className="shortcut-tip">⌨ Enter بيع بالسعر المختار • Space فصال • ↑↓ تغيير الخيار • Esc إغلاق اللوحات</p>
       </aside>
+      <section className="inventory-dock surface">
+        <div className="section-title"><div><h2>🛒 رفوف الدكان</h2><small>توريد سريع: +{GAME_CONFIG.restockAmount} وحدات بسعر التكلفة</small></div><button className="text-button" onClick={() => setModal('inventory')}>إدارة الكل ←</button></div>
+        {lowStockProducts.length > 0 && <div className="stock-radar" role="status"><span>⚠️ مخزون منخفض:</span><div>{lowStockProducts.slice(0, 3).map((product) => <button key={product.id} onClick={() => dokan.restock(product.id)}>{product.icon} {product.name} ({product.stock})</button>)}</div></div>}
+        <div className="product-grid">{game.products.map((product) => <ProductTile key={product.id} product={product} money={game.money} low={dokan.lowStockIds.includes(product.id)} onRestock={dokan.restock} />)}</div>
+      </section>
     </div>
 
+    <div className="portrait-overlay" role="dialog" aria-label="استخدم الهاتف بالطول"><span>📱↻</span><h2>لفّ الموبايل بالطول</h2><p>دكان الحارة متظبط للموبايل العمودي.</p></div>
     {dokan.toast && <div className="toast" role="status">{dokan.toast}</div>}
     {game.phase === 'results' && <Results game={game} onRestart={dokan.restart} />}
     {modal === 'inventory' && <Modal title="إدارة المخزون" close={() => setModal(null)}><InventoryModal products={game.products} money={game.money} onRestock={dokan.restock} lowIds={dokan.lowStockIds} /></Modal>}
@@ -112,7 +115,7 @@ export default function Home() {
   </main>;
 }
 
-function CustomerCheckout({ current, products, quote, selected, setSelected, onChoose, onNegotiate, onLeave, onRestock }: { current: NonNullable<ReturnType<typeof useDokanGame>['game']['currentCustomer']>; products: Product[]; quote: ReturnType<typeof getQuote>; selected: PriceChoice; setSelected: (value: PriceChoice) => void; onChoose: (value: PriceChoice) => void; onNegotiate: () => void; onLeave: () => void; onRestock: (productId: string) => void }) {
+function CustomerCheckout({ current, products, quote, selected, setSelected, onChoose, onNegotiate, onLeave, onRestock, onNext }: { current: NonNullable<ReturnType<typeof useDokanGame>['game']['currentCustomer']>; products: Product[]; quote: ReturnType<typeof getQuote>; selected: PriceChoice; setSelected: (value: PriceChoice) => void; onChoose: (value: PriceChoice) => void; onNegotiate: () => void; onLeave: () => void; onRestock: (productId: string) => void; onNext: () => void }) {
   const ready = ['REQUESTING', 'NEGOTIATING', 'IMPATIENT'].includes(current.state);
   const unavailable = current.basket.flatMap((line) => {
     const product = products.find((item) => item.id === line.productId);
@@ -121,11 +124,12 @@ function CustomerCheckout({ current, products, quote, selected, setSelected, onC
   const selectedPrice = quote[selected];
   const dealProfit = selectedPrice - quote.cost;
   const discount = quote.full - selectedPrice;
+  const terminal = ['SATISFIED', 'LEAVING', 'ANGRY'].includes(current.state);
   return <div className="checkout-content">
     <div className="customer-summary"><span>{current.avatar}</span><div><h3>{current.name}</h3><p>{current.kind} · {current.bio}</p></div></div>
     <div className="meters"><Meter icon="⏳" label="الصبر" value={current.patienceNow} danger={current.patienceNow < 30} /><Meter icon="❤️" label="الرضا" value={current.satisfactionNow} /></div>
     <div className="order-card"><small>الطلب</small><strong>{cartDescriptionFromCustomer(current)}</strong><div><span>الميزانية</span><b>{format(current.budget)} ج</b></div></div>
-    {ready ? <>
+    {terminal ? <div className={`outcome-action ${current.state.toLowerCase()}`}><span>{current.state === 'SATISFIED' ? '✅' : '🚪'}</span><h4>{current.state === 'SATISFIED' ? 'اكتملت العملية' : 'انتهت مقابلة الزبون'}</h4><p>{current.message}</p><button className="primary commit" onClick={onNext}>الزبون التالي ←</button><small>لن ينتقل المشهد حتى تضغط «التالي».</small></div> : ready ? <>
       {unavailable.length > 0 && <div className="order-stockout"><b>⚠️ الطلب ناقص من الرف</b><p>{unavailable.map(({ product, missing }) => `${product.icon} ${product.name}: ناقص ${missing}`).join(' • ')}</p><div>{unavailable.map(({ product }) => <button key={product.id} onClick={() => onRestock(product.id)}>📦 توريد {product.name}</button>)}</div></div>}
       <p className="price-heading">اختَر عرضك للزبون</p>
       <div className="price-options">

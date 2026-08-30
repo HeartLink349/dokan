@@ -14,8 +14,8 @@ export function freshMetrics(): DayMetrics {
 
 export function createNewGame(): GameState {
   return {
-    version: 1, day: 1, phase: 'intro', money: 3200, reputation: 62,
-    products: PRODUCT_CATALOG.map((product) => ({ ...product })),
+    version: 2, day: 1, phase: 'intro', money: GAME_CONFIG.initialCapital, reputation: 62,
+    products: PRODUCT_CATALOG.map((product) => ({ ...product, stock: 0 })),
     queue: DAY_ONE_CUSTOMERS.map((customer) => customer.id), queueIndex: 0, currentCustomer: null,
     metrics: freshMetrics(),
     audio: { master: 70, music: 45, sfx: 70, muted: false },
@@ -105,7 +105,7 @@ function leave(state: GameState, customer: ActiveCustomer, reason: string, angry
 
 export function tickPatience(state: GameState): GameState {
   const customer = state.currentCustomer;
-  if (!customer || !['REQUESTING', 'NEGOTIATING', 'WAITING'].includes(customer.state)) return state;
+  if (!customer || !['NEGOTIATING', 'IMPATIENT'].includes(customer.state)) return state;
   const drain = customer.kind === 'مستعجل' ? 9 : customer.kind === 'عصبي' ? 7 : 4;
   const patienceNow = clamp(customer.patienceNow - drain, 0, 100);
   if (patienceNow <= 0) return leave(state, { ...customer, patienceNow, state: 'IMPATIENT' }, '⏳ اتأخرت عليه جدًا… الزبون مشي.', true);
@@ -158,6 +158,13 @@ export function advanceService(state: GameState): GameState {
   if (customer.state === 'BUYING') return { ...state, currentCustomer: { ...customer, state: 'PAYING', message: '💳 الزبون يدفع الحساب…' } };
   if (customer.state === 'PAYING') return { ...state, currentCustomer: { ...customer, state: 'SATISFIED', message: `${dialogue(customer.kind, 'accept', customer.negotiationRound)} 💰 تمت العملية بنجاح.` } };
   return state;
+}
+
+/** Terminal reactions stay on screen until the player explicitly continues. */
+export function continueCustomer(state: GameState): GameState {
+  const customer = state.currentCustomer;
+  if (!customer || !['SATISFIED', 'LEAVING', 'ANGRY'].includes(customer.state)) return state;
+  return nextCustomer({ ...state, currentCustomer: null });
 }
 
 export function stockout(state: GameState): GameState {

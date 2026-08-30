@@ -1,4 +1,4 @@
-export type ProductCategory = 'مشروبات' | 'سناكس' | 'أساسيات' | 'منزل' | 'حلويات';
+export type ProductCategory = 'مشروبات' | 'سناكس' | 'أساسيات' | 'منزل' | 'حلويات' | 'ألبان' | 'معلبات' | 'مخبوزات' | 'تنظيف' | 'تجميل' | 'فريزر';
 export type CustomerKind = 'الحاج' | 'فصال' | 'ربة بيت' | 'طفل' | 'مستعجل' | 'عصبي' | 'سعر' | 'جودة' | 'موظف' | 'عميل دائم';
 export type CustomerState = 'ENTERING' | 'WAITING' | 'BROWSING' | 'REQUESTING' | 'NEGOTIATING' | 'BUYING' | 'PAYING' | 'SATISFIED' | 'IMPATIENT' | 'ANGRY' | 'LEAVING';
 export type GamePhase = 'intro' | 'opening' | 'playing' | 'results';

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { GAME_CONFIG } from '../config';
 import { AudioManager } from '../core/audio';
-import { advanceService, beginNegotiation, createNewGame, customerReady, customerRequests, customerWaits, finishDay, nextCustomer, priceChoice, rejectCustomer, restartDayOne, restockProduct, tickPatience } from '../core/game';
+import { advanceService, beginNegotiation, continueCustomer, createNewGame, customerReady, customerRequests, customerWaits, finishDay, nextCustomer, priceChoice, rejectCustomer, restartDayOne, restockProduct, tickPatience } from '../core/game';
 import { clearGame, loadGame, saveGame } from '../core/save';
 import type { GameState, PriceChoice, Quality } from '../types';
 
@@ -16,7 +16,7 @@ export function useDokanGame() {
 
   useEffect(() => {
     const saved = loadGame();
-    if (saved?.version === 1) {
+    if (saved?.version === 2) {
       setGame({
         ...saved,
         metrics: { ...saved.metrics, satisfactionTotal: saved.metrics.satisfactionTotal ?? 0 },
@@ -43,9 +43,14 @@ export function useDokanGame() {
   }, [sound]);
 
   const open = useCallback(() => {
+    if (!game.products.some((product) => product.stock > 0)) {
+      sound('error');
+      announce('🛒 اشترِ منتجات للمخزون الأول قبل فتح الدكان.');
+      return;
+    }
     transition((current) => nextCustomer({ ...current, phase: 'opening' }));
     announce('🏪 فتحنا الدكان… أول زبون داخل.');
-  }, [announce, transition]);
+  }, [announce, game.products, sound, transition]);
 
   const choosePrice = useCallback((choice: PriceChoice) => {
     setSelectedPrice(choice);
@@ -58,6 +63,7 @@ export function useDokanGame() {
   }, [announce, transition]);
 
   const leave = useCallback(() => transition(rejectCustomer, 'error'), [transition]);
+  const next = useCallback(() => transition(continueCustomer), [transition]);
   const closeDay = useCallback(() => transition(finishDay), [transition]);
   const restock = useCallback((productId: string) => {
     const product = game.products.find((item) => item.id === productId);
@@ -104,13 +110,6 @@ export function useDokanGame() {
   }, [game.currentCustomer]);
 
   useEffect(() => {
-    const customer = game.currentCustomer;
-    if (!customer || !['SATISFIED', 'LEAVING', 'ANGRY'].includes(customer.state)) return;
-    const timer = window.setTimeout(() => setGame(nextCustomer), GAME_CONFIG.customerExitMs);
-    return () => window.clearTimeout(timer);
-  }, [game.currentCustomer]);
-
-  useEffect(() => {
     if (game.phase !== 'playing') return;
     const timer = window.setInterval(() => setGame(tickPatience), GAME_CONFIG.patienceTickMs);
     return () => window.clearInterval(timer);
@@ -120,15 +119,19 @@ export function useDokanGame() {
     const onKeyDown = (event: KeyboardEvent) => {
       const target = event.target as HTMLElement | null;
       if (target?.tagName === 'INPUT' || target?.tagName === 'SELECT') return;
-      if ((GAME_CONFIG.keybindings.sell as readonly string[]).includes(event.key)) { event.preventDefault(); choosePrice(selectedPrice); }
+      if ((GAME_CONFIG.keybindings.sell as readonly string[]).includes(event.key)) {
+        event.preventDefault();
+        if (game.currentCustomer && ['SATISFIED', 'LEAVING', 'ANGRY'].includes(game.currentCustomer.state)) next();
+        else choosePrice(selectedPrice);
+      }
       if ((GAME_CONFIG.keybindings.negotiate as readonly string[]).includes(event.key)) { event.preventDefault(); negotiate(); }
       if ((GAME_CONFIG.keybindings.priceDown as readonly string[]).includes(event.key)) { event.preventDefault(); setSelectedPrice((choice) => choice === 'full' ? 'smallDiscount' : choice === 'smallDiscount' ? 'customerOffer' : 'full'); }
       if ((GAME_CONFIG.keybindings.priceUp as readonly string[]).includes(event.key)) { event.preventDefault(); setSelectedPrice((choice) => choice === 'full' ? 'customerOffer' : choice === 'smallDiscount' ? 'full' : 'smallDiscount'); }
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [choosePrice, negotiate, selectedPrice]);
+  }, [choosePrice, game.currentCustomer, negotiate, next, selectedPrice]);
 
-  const lowStockIds = useMemo(() => game.products.filter((product) => product.stock <= GAME_CONFIG.lowStockThreshold).map((product) => product.id), [game.products]);
-  return { game, hydrated, toast, selectedPrice, setSelectedPrice, open, choosePrice, negotiate, leave, closeDay, restock, restart, updateAudio, updateQuality, lowStockIds };
+  const lowStockIds = useMemo(() => game.products.filter((product) => product.stock > 0 && product.stock <= GAME_CONFIG.lowStockThreshold).map((product) => product.id), [game.products]);
+  return { game, hydrated, toast, selectedPrice, setSelectedPrice, open, choosePrice, negotiate, leave, next, closeDay, restock, restart, updateAudio, updateQuality, lowStockIds };
 }
