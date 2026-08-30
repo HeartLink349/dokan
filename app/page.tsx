@@ -174,7 +174,7 @@ export default function Home(){
     if(dayEnded||event)return;
     const choices=EVENTS.filter(e=>e.id!=='vip'||reputation>=60||day>=7);const e=choices[Math.floor(Math.random()*choices.length)];
     setEvent({...e,until:Date.now()+6500});addNote(`${e.icon} حدث: ${e.name} — ${e.description}`);notify(`${e.icon} ${e.name}`);
-    if(e.id==='stock-loss'){const eligible=products.filter(p=>p.unlockLevel<=level&&p.stock>0);if(eligible.length){const target=eligible[Math.floor(Math.random()*eligible.length)];setProducts(ps=>ps.map(p=>p.id===target.id?{...p,stock:Math.max(0,p.stock-2)}:p));}}
+    if(e.id==='spoiled'){const eligible=products.filter(p=>p.unlockLevel<=level&&p.stock>0);if(eligible.length){const target=eligible[Math.floor(Math.random()*eligible.length)];setProducts(ps=>ps.map(p=>p.id===target.id?{...p,stock:Math.max(0,p.stock-2)}:p));}}
     if(e.id==='power')setDialog('⚡ الكهرباء قطعت! الزبون مستعجل، حاول ما تتأخرش.');
     window.setTimeout(()=>setEvent(null),6500);
   }
@@ -226,6 +226,7 @@ export default function Home(){
   const goalsView=goals.map(g=>({...g,progress:g.id==='sales'?served:g.id==='profit'?profit:g.id==='rep'?reputation:totalStock,done:g.id==='sales'?served>=g.target:g.id==='profit'?profit>=g.target:g.id==='rep'?reputation>=g.target:totalStock>=g.target}));
 
   return <main className="game" dir="rtl">
+    <div className="portrait-warning" aria-hidden="true"><div><span>📱↔️</span><b>لف الموبايل بالعرض</b><small>اللعبة مصممة أفقيًا عشان تشوف المتجر والزبائن وكل لوحات اللعب معًا.</small></div></div>
     {intro && <div className="overlay"><div className="intro-card"><div className="intro-logo">🏪</div><div className="eyebrow">DOKAN • MARKET SIM</div><h1>دكان الحارة</h1><h2>اليوم {day}</h2><p>ابدأ من محل صغير وابنِ سلسلة ناجحة خلال 30 يومًا وأكثر.</p><div className="intro-grid"><span>💰 رأس المال <b>{money.toLocaleString()}ج</b></span><span>⭐ السمعة <b>{reputation}</b></span><span>🎯 أهداف اليوم <b>{goals.length||4}</b></span><span>🧠 المستوى <b>{level}</b></span></div><button className="primary big" onClick={startDay}>افتح المحل وابدأ اليوم</button><small>يتم الحفظ تلقائيًا على جهازك.</small></div></div>}
 
     <header className="topbar">
@@ -241,11 +242,12 @@ export default function Home(){
       </aside>
 
       <section className="center-column">
-        <div className="scene">
-          <div className="scene-sky"><div className="window"><div>☁️</div><span>شارع الحارة</span></div><div className="ceiling-light">💡</div><div className="fan">✺</div><div className="shelf shelf-a">{visibleProducts.slice(0,6).map(p=><span key={p.id}>{p.icon}</span>)}</div><div className="shelf shelf-b">{visibleProducts.slice(6,12).map(p=><span key={p.id}>{p.icon}</span>)}</div><div className="fridge"><div className="fridge-glass">{visibleProducts.filter(p=>['water','juice','milk'].includes(p.id)).map(p=><span key={p.id}>{p.icon}</span>)}</div><b>بارد ❄</b></div><div className="radio">📻</div><div className="poster">الزبون<br/>على حق</div></div>
-          <div className="floor"></div><div className="counter"><div className="cashier">🧑🏻‍💼</div><div className="register">🖥️<small>الكاشير</small></div><div className="sign">أمانة ورزق<br/>بالكسب الحلال</div></div>
-          <div className="door">🚪</div>
-          <div className="customer-row">{customer && <div className="active-customer"><div className="speech">{dialog||customer.text}</div><div className="avatar">{customer.icon}</div><span className={`mood-dot ${mood>=70?'happy':mood>=45?'neutral':'angry'}`}>{mood>=70?'🙂':mood>=45?'😐':'😠'}</span><b>{customer.name}</b></div>}{!customer&&!dayEnded&&<button className="welcome-btn" onClick={()=>nextFromQueue()}>🚪 استقبال الزبون التالي</button>}{dayEnded&&<div className="closed-sign"><span>🌙</span><b>المحل مغلق</b><small>راجع تقرير اليوم للمتابعة</small></div>}</div>
+        <div className="scene scene-reference">
+          <img className="scene-reference-image" src="/store-scene.png" alt="مشهد دكان الحارة" draggable={false}/>
+          <div className="scene-vignette" aria-hidden="true" />
+          {customer && <div className="scene-dialog"><span>{dialog||customer.text}</span><b>{customer.name} • {customer.kind}</b></div>}
+          {!customer&&!dayEnded&&<button className="welcome-btn scene-welcome" onClick={()=>nextFromQueue()}>🚪 استقبال الزبون التالي</button>}
+          {dayEnded&&<div className="closed-sign scene-closed"><span>🌙</span><b>المحل مغلق</b><small>راجع تقرير اليوم للمتابعة</small></div>}
           {event&&<div className="event-badge"><span>{event.icon}</span><div><b>{event.name}</b><small>{event.description}</small></div></div>}
         </div>
         <div className="bottom-grid">

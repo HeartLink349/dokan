@@ -3,3 +3,93 @@
 @media(max-width:1000px){.topbar{grid-template-columns:190px 1fr}.top-actions{grid-column:1/-1}.main-grid{grid-template-columns:220px 1fr}.right-column{grid-column:1/-1;display:grid;grid-template-columns:1fr 1.7fr;gap:10px}.right-column .panel+.panel{margin-top:0}.bottom-grid{grid-template-columns:1fr 1.3fr}.end-panel{display:none}.scene{height:600px}}
 @media(max-width:700px){.game{padding:5px}.topbar{grid-template-columns:1fr}.stats-row{grid-template-columns:repeat(2,1fr)}.top-actions{grid-template-columns:repeat(3,1fr)}.main-grid{grid-template-columns:1fr}.left-column{display:grid;grid-template-columns:1fr 1fr;gap:7px}.left-column .panel+.panel{margin-top:0}.right-column{grid-column:auto;display:block}.right-column .panel+.panel{margin-top:8px}.scene{height:560px}.scene-sky{inset:0 0 175px}.floor{height:175px}.counter{left:8%;right:12%;height:145px}.cashier{font-size:72px;bottom:92px}.shelf{left:22%;right:25%;font-size:24px}.fridge{width:18%;height:210px}.window{height:190px}.active-customer .avatar{font-size:82px}.active-customer .speech{width:190px;font-size:11px}.bottom-grid{grid-template-columns:1fr 1fr}.modal-list,.upgrade-grid,.menu-grid{grid-template-columns:1fr}.report-grid,.intro-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:430px){.left-column{grid-template-columns:1fr}.scene{height:520px}.top-actions button{font-size:19px}.stat b{font-size:20px}.stat strong{font-size:14px}.bottom-grid{grid-template-columns:1fr}.fridge{display:none}.window{width:24%}.shelf{left:8%;right:28%}.counter{left:3%;right:7%}.customer-stats{font-size:10px}.active-customer .speech{bottom:98px}.active-customer .avatar{font-size:72px}}
+
+/* Reference-first game board: the provided artwork is the actual shop scene. */
+.scene-reference{height:auto!important;aspect-ratio:970/625;background:#151a16!important;display:block;isolation:isolate}
+.scene-reference-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;user-select:none;-webkit-user-drag:none}
+.scene-vignette{position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,#0000 60%,#0004 100%);z-index:2}
+.scene-dialog{position:absolute;z-index:12;left:50%;bottom:12%;transform:translateX(-50%);width:min(300px,38%);text-align:center;animation:pop .22s ease}
+.scene-dialog span{display:block;background:#fff8e8;color:#34261d;border:2px solid #563a25;border-radius:14px;padding:10px 12px;font-weight:900;font-size:clamp(10px,1vw,14px);box-shadow:0 5px 14px #0008}
+.scene-dialog b{display:inline-block;margin-top:5px;background:#151817e8;border:1px solid #8a6133;border-radius:999px;padding:4px 9px;color:#ffd86b;font-size:10px}
+.scene-welcome{z-index:12;bottom:4%;left:3%;position:absolute}
+.scene-closed{z-index:12;bottom:6%}
+
+/* Portrait phone: keep the same game board proportions, but stack the complete UI vertically. */
+@media (max-width:700px){
+  html,body{background:#090b0a;overflow-x:hidden}
+  .game{padding:6px;min-width:0}
+  .topbar{display:grid;grid-template-columns:1fr;gap:6px;position:relative}
+  .brand-card{min-height:58px;justify-content:center}
+  .brand-icon{font-size:30px}.brand-card strong{font-size:20px}
+  .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+  .stat{padding:6px 3px;border-radius:7px}.stat>span{font-size:9px}.stat div{gap:2px;margin-top:3px}.stat b{font-size:17px}.stat strong{font-size:11px}
+  .top-actions{grid-template-columns:repeat(3,1fr);gap:4px}.top-actions button{padding:7px 3px;font-size:18px}.top-actions span{font-size:9px}
+  .main-grid{display:flex;flex-direction:column;gap:7px;margin-top:7px}
+  .center-column{order:1;display:flex;flex-direction:column}
+  .left-column{order:2;display:flex;flex-direction:column;gap:7px}
+  .right-column{order:3;display:flex;flex-direction:column;gap:7px}
+  .left-column .panel+.panel,.right-column .panel+.panel{margin-top:0}
+  .scene-reference{width:100%;aspect-ratio:970/625;border-radius:8px}
+  .scene-dialog{width:52%;bottom:10%}.scene-dialog span{font-size:10px;padding:7px}.scene-dialog b{font-size:8px}
+  .scene-welcome{font-size:11px;padding:7px 9px;bottom:3%}
+  .event-badge{max-width:48%;padding:5px 7px;top:7px;left:7px}.event-badge>span{font-size:20px}.event-badge b{font-size:10px}.event-badge small{font-size:8px}
+  .bottom-grid{grid-template-columns:1fr 1fr;order:2;margin-top:7px}.bottom-grid .panel{min-height:155px}
+  .tip-bar{order:3;font-size:10px}
+  .inventory-list{max-height:none}
+  .customer-card{padding:9px}.customer-head>span{font-size:55px}.customer-head h3{font-size:18px}
+}
+@media (max-width:430px){
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+  .scene-reference{aspect-ratio:970/625}
+  .bottom-grid{grid-template-columns:1fr}
+  .panel-title h2{font-size:14px}
+  .goal span{font-size:11px}.product-row{grid-template-columns:36px 1fr 58px}
+  .product-icon{font-size:24px}.product-info b{font-size:12px}
+  .customer-head>span{font-size:50px}
+}
+
+/* ===== Landscape reference layout =====
+   The supplied reference is the visual target: three clear columns,
+   compact top HUD, large shop scene, and four information panels below it. */
+.topbar{grid-template-columns:250px minmax(0,1fr) 260px;grid-template-areas:"brand stats actions"}
+.brand-card{grid-area:brand}
+.stats-row{grid-area:stats}
+.top-actions{grid-area:actions}
+.main-grid{grid-template-columns:270px minmax(560px,1fr) 300px;grid-template-areas:"left center right";align-items:start}
+.left-column{grid-area:left}
+.center-column{grid-area:center}
+.right-column{grid-area:right}
+.scene-reference{aspect-ratio:970/625;height:auto;min-height:0}
+.scene-reference-image{object-fit:cover}
+.bottom-grid{grid-template-columns:1fr 1.45fr 1.1fr 1fr}
+.portrait-warning{display:none}
+
+/* Keep the game landscape-first on phones. */
+@media (max-width:1100px) and (orientation:landscape){
+  .game{padding:6px;min-width:0}
+  .topbar{grid-template-columns:150px minmax(0,1fr) 175px;gap:5px}
+  .brand-card{padding:6px 8px}.brand-icon{font-size:25px}.brand-card strong{font-size:17px}
+  .stats-row{gap:4px}.stat{padding:5px 4px}.stat>span{font-size:9px}.stat b{font-size:18px}.stat strong{font-size:13px}
+  .top-actions{gap:4px}.top-actions button{font-size:18px}.top-actions span{font-size:8px}
+  .main-grid{grid-template-columns:175px minmax(0,1fr) 205px;gap:5px;margin-top:6px}
+  .panel-title{padding:6px 8px}.panel-title h2{font-size:12px}
+  .goal{margin:3px;padding:4px;grid-template-columns:21px 1fr 16px}.goal b{width:19px;height:19px}.goal span{font-size:9px}.goal small{font-size:8px}
+  .inventory-list{max-height:300px}.product-row{grid-template-columns:28px 1fr 45px;padding:5px}.product-icon{font-size:20px}.product-info b{font-size:10px}.product-info small,.product-num small{font-size:8px}.product-num strong{font-size:10px}
+  .wide{font-size:10px;padding:6px 5px;margin:3px 5px;width:calc(100% - 10px)}
+  .scene-dialog{width:min(240px,42%);bottom:10%}.scene-dialog span{font-size:9px;padding:6px}.scene-dialog b{font-size:7px}
+  .event-badge{top:6px;left:6px;padding:5px 7px;max-width:220px}.event-badge>span{font-size:19px}.event-badge b{font-size:9px}.event-badge small{font-size:7px}
+  .bottom-grid{grid-template-columns:1fr 1.2fr 1fr 1fr;gap:5px;margin-top:5px}.bottom-grid .panel{min-height:130px}
+  .metric-list div{font-size:9px;padding:4px}.log-list p{font-size:8px;padding:5px}.random-content p,.end-content p{font-size:8px;min-height:35px}.random-icon,.moon{font-size:30px}
+  .customer-card{padding:7px}.customer-head>span{font-size:45px}.customer-head h3{font-size:15px}.customer-head label{font-size:8px;padding:2px 5px}.customer-stats span{font-size:8px}.need-card{padding:6px}.need-card b{font-size:11px}.need-card small{font-size:8px}.field-label{font-size:8px}.price-control input,.price-control span{padding:6px;font-size:10px}.button-stack{gap:3px}
+  .progress-items{font-size:8px;padding:6px 8px}.today-event>small{font-size:8px}.big-event-icon{font-size:34px;padding:5px}
+}
+
+@media (max-width:900px) and (orientation:portrait){
+  .portrait-warning{display:flex;position:fixed;inset:0;z-index:9999;background:radial-gradient(circle at center,#252d27,#080a09 70%);align-items:center;justify-content:center;text-align:center;padding:28px}
+  .portrait-warning>div{max-width:300px;border:1px solid #7d542c;border-radius:16px;padding:24px;background:#121614;box-shadow:0 20px 60px #000b}
+  .portrait-warning span{display:block;font-size:52px;margin-bottom:10px}.portrait-warning b{display:block;color:#ffd86a;font-size:21px}.portrait-warning small{display:block;color:#bbb;line-height:1.8;margin-top:8px}
+  .game{min-height:100vh}
+}
+.scene-dialog{bottom:4%;width:min(360px,46%);}
+.scene-dialog span{background:#171a18e8;color:#ffe6a4;border:1px solid #9a6b34;border-radius:999px;padding:7px 12px;box-shadow:0 6px 18px #0009;font-size:clamp(9px,.9vw,12px)}
+.scene-dialog b{background:#0e1110e8;border-color:#76552f;color:#ffd66a;font-size:8px}
