@@ -76,8 +76,14 @@ export function customerReady(state: GameState): GameState {
   if (!customer || customer.state !== 'ENTERING') return state;
   return {
     ...state,
-    currentCustomer: { ...customer, state: 'BROWSING', message: '🔎 يتفقد الرفوف ويجهز طلبه…' },
+    currentCustomer: { ...customer, state: 'WAITING', message: '🧺 وصل للكاشير وينتظر أن تجهّز الطلب.' },
   };
+}
+
+export function customerWaits(state: GameState): GameState {
+  const customer = state.currentCustomer;
+  if (!customer || customer.state !== 'WAITING') return state;
+  return { ...state, currentCustomer: { ...customer, state: 'BROWSING', message: '🔎 يتفقد الرفوف ويجهز طلبه…' } };
 }
 
 export function customerRequests(state: GameState): GameState {

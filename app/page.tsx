@@ -7,7 +7,6 @@ import { PRODUCT_CATALOG } from './game/data/products';
 import { averageSatisfaction, bestAndWorstProducts, cartDescription, getQuote, netProfit } from './game/core/game';
 import { useDokanGame } from './game/hooks/useDokanGame';
 import type { CustomerState, PriceChoice, Product } from './game/types';
-import ar from './game/locales/ar-EG';
 
 type ModalName = 'inventory' | 'settings' | 'guide' | null;
 const stateLabel: Record<CustomerState, string> = {
@@ -33,7 +32,6 @@ export default function Home() {
   }, []);
 
   return <main className={`dokan-app quality-${game.settings.quality}`} dir="rtl">
-    <PortraitOverlay />
     <header className="app-header">
       <div className="brand-lockup"><span className="brand-store">د</span><div><strong>دكان الحارة</strong><small>محاكاة بقالة مصرية • اليوم الأول</small></div></div>
       <div className="stat-strip" aria-label="إحصاءات اليوم">
@@ -73,9 +71,10 @@ export default function Home() {
 
       <section className="play-area">
         <div className="scene-frame" aria-label="مشهد دكان الحارة">
-          <img src="/store-scene.png" alt="داخل محل بقالة مصري دافئ" draggable={false} />
+          <img src="/store-scene.jpg" alt="خلفية لعبة دكان الحارة" draggable={false} />
           <div className="scene-shade" />
           {current && <div className={`customer-actor ${current.state.toLowerCase()}`}><span>{current.avatar}</span><b>{current.name}</b></div>}
+          {game.phase === 'playing' && queuePreview.length > 0 && <div className="scene-queue" aria-label="زبائن في انتظار دورهم"><small>في الانتظار</small><div>{queuePreview.slice(0, 2).map((customer, index) => customer && <span key={customer.id} className={`queue-actor queue-${index}`} title={`${customer.name} — ${customer.kind}`}>{customer.avatar}</span>)}</div></div>}
           <div className="scene-status"><span className={game.phase === 'playing' ? 'open-dot' : 'closed-dot'} />{game.phase === 'playing' ? 'المحل مفتوح' : game.phase === 'results' ? 'أُغلق المحل' : 'في انتظار فتح المحل'}</div>
           {current && <div className="dialogue-bubble"><small>{current.name} • {current.kind} • {stateLabel[current.state]}</small><p>{current.message}</p></div>}
           {!current && game.phase === 'playing' && <div className="scene-message">باب الدكان مفتوح… الزبون التالي في الطريق.</div>}
@@ -155,4 +154,3 @@ function Stat({ icon, label, value, tone }: { icon: string; label: string; value
 function Objective({ done, text, value }: { done: boolean; text: string; value: string }) { return <div className={done ? 'objective done' : 'objective'}><span>{done ? '✓' : '○'}</span><p>{text}<b>{value}</b></p></div>; }
 function Meter({ icon, label, value, danger }: { icon: string; label: string; value: number; danger?: boolean }) { return <div className={`meter ${danger ? 'danger-meter' : ''}`}><div><span>{icon} {label}</span><b>{Math.round(value)}%</b></div><i><b style={{ width: `${Math.max(0, Math.min(100, value))}%` }} /></i></div>; }
 function Modal({ title, close, children }: { title: string; close: () => void; children: React.ReactNode }) { return <div className="modal-layer" onMouseDown={close}><section className="modal" onMouseDown={(event) => event.stopPropagation()}><header><h2>{title}</h2><button onClick={close} aria-label="إغلاق">×</button></header>{children}</section></div>; }
-function PortraitOverlay() { return <div className="portrait-overlay"><span>📱↔️</span><h2>{ar.rotate}</h2><p>{ar.rotateHint}</p></div>; }

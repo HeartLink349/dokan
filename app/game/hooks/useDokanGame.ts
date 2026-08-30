@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { GAME_CONFIG } from '../config';
 import { AudioManager } from '../core/audio';
-import { advanceService, beginNegotiation, createNewGame, customerReady, customerRequests, finishDay, nextCustomer, priceChoice, rejectCustomer, restartDayOne, restockProduct, tickPatience } from '../core/game';
+import { advanceService, beginNegotiation, createNewGame, customerReady, customerRequests, customerWaits, finishDay, nextCustomer, priceChoice, rejectCustomer, restartDayOne, restockProduct, tickPatience } from '../core/game';
 import { clearGame, loadGame, saveGame } from '../core/save';
 import type { GameState, PriceChoice, Quality } from '../types';
 
@@ -78,8 +78,9 @@ export function useDokanGame() {
 
   useEffect(() => {
     const customer = game.currentCustomer;
-    if (!customer || !['ENTERING', 'BROWSING'].includes(customer.state)) return;
-    const timer = window.setTimeout(() => setGame(customer.state === 'ENTERING' ? customerReady : customerRequests), GAME_CONFIG.customerEnterMs);
+    if (!customer || !['ENTERING', 'WAITING', 'BROWSING'].includes(customer.state)) return;
+    const nextState = customer.state === 'ENTERING' ? customerReady : customer.state === 'WAITING' ? customerWaits : customerRequests;
+    const timer = window.setTimeout(() => setGame(nextState), GAME_CONFIG.customerEnterMs);
     return () => window.clearTimeout(timer);
   }, [game.currentCustomer]);
 
