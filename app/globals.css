@@ -93,3 +93,151 @@
 .scene-dialog{bottom:4%;width:min(360px,46%);}
 .scene-dialog span{background:#171a18e8;color:#ffe6a4;border:1px solid #9a6b34;border-radius:999px;padding:7px 12px;box-shadow:0 6px 18px #0009;font-size:clamp(9px,.9vw,12px)}
 .scene-dialog b{background:#0e1110e8;border-color:#76552f;color:#ffd66a;font-size:8px}
+
+/* =========================================================
+   PIXEL-REFERENCE / LANDSCAPE-FIRST OVERRIDES
+   The supplied 1536x1024 reference is the target composition.
+   ========================================================= */
+html,body{background:#090b0a}
+.game{padding:6px;max-width:none;min-height:100vh;background:#0d100f}
+.topbar{
+  max-width:1536px;
+  grid-template-columns:270px minmax(0,1fr) 270px;
+  grid-template-areas:"brand stats actions";
+  gap:8px;
+}
+.brand-card{min-height:112px;padding:10px 14px;border-radius:10px}
+.brand-icon{font-size:42px}
+.brand-card span{font-size:12px}
+.brand-card strong{font-size:24px}
+.stats-row{gap:8px}
+.stat{min-height:112px;padding:9px 7px;border-radius:10px}
+.stat>span{font-size:15px}
+.stat b{font-size:26px}
+.stat strong{font-size:18px}
+.stats-row .stat:nth-child(5){display:none}
+.top-actions{gap:8px}
+.top-actions button{min-height:112px;font-size:30px;border-radius:10px}
+.top-actions span{font-size:12px}
+
+.main-grid{
+  max-width:1536px;
+  margin:8px auto 0;
+  grid-template-columns:270px minmax(0,1fr) 270px;
+  grid-template-rows:auto auto auto;
+  grid-template-areas:
+    "left center right"
+    "left bottom bottom"
+    "left tip tip";
+  gap:8px;
+  align-items:start;
+}
+.left-column{grid-area:left;min-width:0}
+.center-column{grid-area:center;min-width:0}
+.right-column{grid-area:right;min-width:0}
+.bottom-grid{
+  grid-area:bottom;
+  display:grid;
+  grid-template-columns:1fr 1.45fr 1fr 1.05fr;
+  gap:8px;
+  margin-top:0;
+}
+.tip-bar{grid-area:tip;margin-top:0}
+.panel{border-radius:9px}
+.panel-title{padding:9px 12px}
+.panel-title h2{font-size:18px}
+.goals-panel .goal-list{padding:3px 5px 6px}
+.goal{margin:5px;padding:7px}
+.goal span{font-size:13px}
+.goal small{font-size:10px}
+.inventory-list{max-height:510px}
+.product-row{grid-template-columns:42px 1fr 65px;padding:8px}
+.product-icon{font-size:29px}
+.product-info b{font-size:14px}
+.product-info small,.product-num small{font-size:10px}
+.product-num strong{font-size:12px}
+.wide{margin:5px 8px}
+.scene-reference{
+  width:100%;
+  height:auto!important;
+  aspect-ratio:970/625;
+  min-height:0;
+  border-radius:9px;
+}
+.scene-reference-image{object-fit:cover}
+.scene-vignette{background:linear-gradient(180deg,#0000 72%,#0003 100%)}
+.scene-dialog{width:min(370px,48%);bottom:6%}
+.scene-dialog span{font-size:12px;padding:8px 13px}
+.scene-dialog b{font-size:8px}
+.scene-welcome{bottom:3%;left:3%}
+.event-badge{top:10px;left:10px}
+.today-event{min-height:110px}
+.customer-panel{min-height:510px}
+.right-column .progression{display:none}
+.customer-card{padding:11px}
+.customer-head{gap:12px}
+.customer-head>span{font-size:74px}
+.customer-head h3{font-size:22px}
+.customer-stats{gap:2px;margin:9px 0}
+.customer-stats span{font-size:12px;padding:5px 0}
+.need-card{padding:10px}
+.need-card b{font-size:16px}
+.button-stack{gap:6px}
+.bottom-grid .panel{min-height:170px}
+.metric-list div{font-size:12px;padding:7px 0}
+.log-list p{font-size:10px}
+.random-content p,.end-content p{font-size:11px}
+.tip-bar{padding:8px;font-size:11px}
+
+/* The reference is deliberately landscape-first. Never stack the board vertically. */
+@media (orientation:portrait){
+  .portrait-warning{
+    display:flex!important;
+    position:fixed!important;
+    inset:0!important;
+    z-index:99999!important;
+    background:radial-gradient(circle at center,#252d27,#080a09 70%)!important;
+    align-items:center!important;
+    justify-content:center!important;
+    text-align:center!important;
+    padding:28px!important;
+  }
+  .portrait-warning>div{
+    max-width:310px;border:1px solid #7d542c;border-radius:16px;padding:24px;
+    background:#121614;box-shadow:0 20px 60px #000b
+  }
+  .portrait-warning span{display:block;font-size:52px;margin-bottom:10px}
+  .portrait-warning b{display:block;color:#ffd86a;font-size:21px}
+  .portrait-warning small{display:block;color:#bbb;line-height:1.8;margin-top:8px}
+}
+@media (orientation:landscape){
+  .portrait-warning{display:none!important}
+}
+
+/* Landscape phones/tablets: preserve the same 3-column reference, only scale it down. */
+@media (max-width:1100px) and (orientation:landscape){
+  .game{padding:4px;min-width:0}
+  .topbar{grid-template-columns:175px minmax(0,1fr) 190px;gap:5px}
+  .brand-card,.stat,.top-actions button{min-height:76px}
+  .brand-card{padding:6px 8px}.brand-icon{font-size:26px}
+  .brand-card strong{font-size:17px}.brand-card span{font-size:9px}
+  .stats-row{gap:4px}.stat{padding:5px 3px}.stat>span{font-size:9px}.stat b{font-size:18px}.stat strong{font-size:12px}
+  .top-actions{gap:4px}.top-actions button{font-size:19px}.top-actions span{font-size:8px}
+  .main-grid{grid-template-columns:175px minmax(0,1fr) 190px;gap:5px;margin-top:5px}
+  .panel-title{padding:6px 8px}.panel-title h2{font-size:12px}
+  .goal{margin:3px;padding:4px;grid-template-columns:20px 1fr 16px}.goal b{width:18px;height:18px}.goal span{font-size:9px}.goal small{font-size:7px}
+  .inventory-list{max-height:360px}.product-row{grid-template-columns:28px 1fr 43px;padding:5px}.product-icon{font-size:20px}.product-info b{font-size:9px}.product-info small,.product-num small{font-size:7px}.product-num strong{font-size:9px}
+  .wide{font-size:9px;padding:5px 4px;margin:3px 4px;width:calc(100% - 8px)}
+  .scene-dialog{width:min(250px,48%);bottom:5%}.scene-dialog span{font-size:8px;padding:5px 8px}.scene-dialog b{font-size:6px}
+  .event-badge{top:5px;left:5px;padding:4px 6px;max-width:200px}.event-badge>span{font-size:18px}.event-badge b{font-size:8px}.event-badge small{font-size:6px}
+  .today-event{min-height:76px}.big-event-icon{font-size:30px;padding:3px}.today-event>b{font-size:11px}.today-event>small{font-size:7px;padding:3px 8px}
+  .customer-panel{min-height:350px}.customer-head>span{font-size:45px}.customer-head h3{font-size:14px}.customer-head label{font-size:7px}
+  .customer-stats span{font-size:7px;padding:3px 0}.need-card{padding:5px}.need-card b{font-size:10px}.need-card small{font-size:7px}.field-label{font-size:7px}
+  .price-control input,.price-control span{padding:5px;font-size:9px}.button-stack{gap:3px}
+  .bottom-grid{grid-template-columns:1fr 1.45fr 1fr 1.05fr;gap:4px}.bottom-grid .panel{min-height:100px}
+  .metric-list div{font-size:8px;padding:3px}.log-list p{font-size:6px;padding:4px}.random-content p,.end-content p{font-size:7px;min-height:25px}.random-icon,.moon{font-size:26px}
+  .tip-bar{font-size:7px;padding:5px}
+}
+
+.stats-row{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:1100px) and (orientation:landscape){.stats-row{grid-template-columns:repeat(4,minmax(0,1fr))}}

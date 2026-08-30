@@ -25,9 +25,9 @@ const PRODUCT_SEED: Product[] = [
   {id:'chips',name:'شيبسي',icon:'🥔',cost:12,basePrice:20,stock:15,maxStock:15,demand:1.2,unlockLevel:1,category:'سناكس'},
   {id:'juice',name:'عصير',icon:'🧃',cost:9,basePrice:18,stock:15,maxStock:15,demand:1.15,unlockLevel:1,category:'مشروبات'},
   {id:'chocolate',name:'شوكولاتة',icon:'🍫',cost:14,basePrice:25,stock:12,maxStock:15,demand:.9,unlockLevel:1,category:'حلويات'},
-  {id:'cigs',name:'سجائر',icon:'🚬',cost:20,basePrice:30,stock:8,maxStock:10,demand:.8,unlockLevel:3,category:'مقيدة'},
-  {id:'tissue',name:'مناديل',icon:'🧻',cost:7,basePrice:12,stock:10,maxStock:15,demand:.85,unlockLevel:2,category:'منزلية'},
-  {id:'toy',name:'لعبة أطفال',icon:'🪀',cost:5,basePrice:10,stock:10,maxStock:15,demand:.75,unlockLevel:2,category:'أطفال'},
+  {id:'cigs',name:'سجائر',icon:'🚬',cost:20,basePrice:30,stock:8,maxStock:10,demand:.8,unlockLevel:1,category:'مقيدة'},
+  {id:'tissue',name:'مناديل',icon:'🧻',cost:7,basePrice:12,stock:10,maxStock:15,demand:.85,unlockLevel:1,category:'منزلية'},
+  {id:'toy',name:'لعبة أطفال',icon:'🪀',cost:5,basePrice:10,stock:10,maxStock:15,demand:.75,unlockLevel:1,category:'أطفال'},
   {id:'coffee',name:'قهوة',icon:'☕',cost:11,basePrice:22,stock:0,maxStock:15,demand:1.0,unlockLevel:4,category:'مشروبات'},
   {id:'milk',name:'حليب',icon:'🥛',cost:13,basePrice:24,stock:0,maxStock:15,demand:1.25,unlockLevel:5,category:'أساسيات'},
   {id:'cereal',name:'حبوب إفطار',icon:'🥣',cost:18,basePrice:32,stock:0,maxStock:12,demand:.95,unlockLevel:6,category:'أساسيات'},
@@ -35,6 +35,7 @@ const PRODUCT_SEED: Product[] = [
 ];
 
 const CUSTOMER_SEED: Customer[] = [
+  {id:'karim',name:'كريم',icon:'👦🏻',kind:'طالب',need:'chips',budget:25,patience:58,priceSense:1.28,negotiation:.78,baseMood:72,text:'مش عاجبني السعر!'},
   {id:'yousef',name:'يوسف',icon:'🧒',kind:'طالب',need:'chips',budget:23,patience:82,priceSense:1.1,negotiation:.35,baseMood:76,text:'عايز شيبسي بسرعة قبل الدرس.'},
   {id:'mahmoud',name:'محمود',icon:'🧔',kind:'فصال',need:'biscuit',budget:22,patience:65,priceSense:1.25,negotiation:.9,baseMood:60,text:'معايا ميزانية محدودة… نعملها 13؟'},
   {id:'said',name:'عم سيد',icon:'👴',kind:'رجل كبير',need:'water',budget:25,patience:88,priceSense:.95,negotiation:.25,baseMood:72,text:'المهم الجودة يا ابني، والسعر يكون معقول.'},
@@ -133,10 +134,9 @@ export default function Home(){
   const addNote=useCallback((text:string)=>setNotes(n=>[...n.slice(-11),text]),[]);
 
   const makeGoals=useCallback((d:number):Goal[]=>[
-    {id:'sales',text:`بع ${Math.min(12,5+Math.floor(d/2))} منتجات`,target:Math.min(12,5+Math.floor(d/2)),progress:0,reward:70+d*6,xp:35+d*2,done:false},
-    {id:'profit',text:`حقق ربحًا قدره ${Math.min(500,180+d*18)} جنيه`,target:Math.min(500,180+d*18),progress:0,reward:90+d*8,xp:45+d*2,done:false},
-    {id:'rep',text:'حافظ على السمعة فوق 45',target:45,progress:50,reward:60+d*5,xp:30+d,done:false},
-    {id:'stock',text:'احتفظ بمخزون أساسي لا يقل عن 8',target:8,progress:8,reward:50+d*4,xp:25+d,done:false},
+    {id:'profit',text:'حقق ربحًا لا يقل عن 250 جنيه',target:250,progress:0,reward:110+d*6,xp:50+d*2,done:false},
+    {id:'rep',text:'لا تنخفض السمعة عن 40',target:40,progress:50,reward:70+d*5,xp:35+d,done:false},
+    {id:'sales',text:'جهّز 8 منتجات',target:8,progress:0,reward:80+d*5,xp:40+d,done:false},
   ],[]);
 
   useEffect(()=>{if(!goals.length)setGoals(makeGoals(day));},[day,goals.length,makeGoals]);
@@ -160,7 +160,14 @@ export default function Home(){
   }
   function buildQueue(d:number, unlocked:Product[], count:number, rep:number){
     const pool=CUSTOMER_SEED.filter(c=>unlocked.some(p=>p.id===c.need)&& (c.kind!=='VIP'||rep>=65||d>=10));
-    const arr:Customer[]=[]; for(let i=0;i<count;i++){const base=pool[(i*3+d)%pool.length]; const c={...base,id:`${base.id}-${d}-${i}`,budget:Math.round(base.budget*(1+d*.025+(Math.random()-.5)*.12)),patience:clamp(base.patience+d*.5,15,98),baseMood:clamp(base.baseMood+rep*.08+(Math.random()*8-4),15,98)}; arr.push(c);} return arr;
+    const arr:Customer[]=[]; 
+    for(let i=0;i<count;i++){
+      const preferred = d===1 && i===0 ? pool.find(c=>c.id==='karim') : undefined;
+      const base=preferred || pool[(i*3+d)%pool.length];
+      const c={...base,id:`${base.id}-${d}-${i}`,budget:Math.round(base.budget*(1+d*.025+(Math.random()-.5)*.12)),patience:clamp(base.patience+d*.5,15,98),baseMood:clamp(base.baseMood+rep*.08+(Math.random()*8-4),15,98)};
+      arr.push(c);
+    } 
+    return arr;
   }
   function nextFromQueue(queue=customerQueue){
     if(dayEnded||busy)return;
@@ -230,7 +237,7 @@ export default function Home(){
     {intro && <div className="overlay"><div className="intro-card"><div className="intro-logo">🏪</div><div className="eyebrow">DOKAN • MARKET SIM</div><h1>دكان الحارة</h1><h2>اليوم {day}</h2><p>ابدأ من محل صغير وابنِ سلسلة ناجحة خلال 30 يومًا وأكثر.</p><div className="intro-grid"><span>💰 رأس المال <b>{money.toLocaleString()}ج</b></span><span>⭐ السمعة <b>{reputation}</b></span><span>🎯 أهداف اليوم <b>{goals.length||4}</b></span><span>🧠 المستوى <b>{level}</b></span></div><button className="primary big" onClick={startDay}>افتح المحل وابدأ اليوم</button><small>يتم الحفظ تلقائيًا على جهازك.</small></div></div>}
 
     <header className="topbar">
-      <div className="brand-card"><div className="brand-icon">📅</div><div><span>دكان الحارة</span><strong>اليوم {day}</strong></div></div>
+      <div className="brand-card"><div className="brand-icon">📅</div><div><span>محلي</span><strong>اليوم {day}</strong></div></div>
       <div className="stats-row"><Stat title="الوقت" value={timeLabel} icon="🕐"/><Stat title="رأس المال" value={`${money.toLocaleString()} ج`} icon="💵"/><Stat title="ربح اليوم" value={`${profit.toLocaleString()} ج`} icon="📈"/><Stat title="السمعة" value={`${reputation}/100`} icon={reputation>=70?'😄':reputation>=45?'🙂':'😟'}/><Stat title="المستوى" value={`Lv.${level}`} icon="⭐"/></div>
       <div className="top-actions"><button onClick={()=>setPanel('notebook')}>📋<span>المذكرة</span></button><button onClick={()=>setPanel('upgrades')}>🔧<span>التطوير</span></button><button onClick={()=>setPanel('menu')}>☰<span>القائمة</span></button></div>
     </header>
@@ -250,20 +257,21 @@ export default function Home(){
           {dayEnded&&<div className="closed-sign scene-closed"><span>🌙</span><b>المحل مغلق</b><small>راجع تقرير اليوم للمتابعة</small></div>}
           {event&&<div className="event-badge"><span>{event.icon}</span><div><b>{event.name}</b><small>{event.description}</small></div></div>}
         </div>
-        <div className="bottom-grid">
+      </section>
+
+      <aside className="right-column">
+        <section className="panel today-event"><PanelTitle icon={event?.icon||'⚡'} title="حدث اليوم"/><div className="big-event-icon">{event?.icon||'🌤️'}</div><b>{event?.name||'المحل يعمل طبيعيًا'}</b><small>{event?.description||'يمكنك إطلاق حدث عشوائي يدويًا.'}</small></section>
+        <section className="panel customer-panel"><PanelTitle icon="👤" title="الزبون الحالي"/>{customer&&currentProduct?<div className="customer-card"><div className="customer-head"><span>{customer.icon}</span><div><h3>{customer.name}</h3><label>{customer.kind}</label></div></div><div className="customer-stats"><span>💰 الميزانية <b>{customer.budget}</b></span><span>⏳ الصبر <b>{customer.patience>70?'عالية':customer.patience>45?'متوسط':'منخفض'}</b></span><span>🧠 المعرفة بالأسعار <b>{customer.priceSense>1.15?'عالية':customer.priceSense<.9?'منخفضة':'متوسطة'}</b></span><span>🤝 الموقف <b>{customer.negotiation>.65?'تفاوض':'شراء'}</b></span></div><div className="need-card"><span>يريد</span><b>{currentProduct.icon} {currentProduct.name}</b><small>سعره الأقصى: {customer.budget-3}ج</small></div><label className="field-label">سعر البيع</label><div className="price-control"><input type="number" min={currentProduct.cost+1} value={price} onChange={e=>setPrice(Number(e.target.value))}/><span>ج</span></div><div className="button-stack"><button className="primary" onClick={sell} disabled={busy}>💵 بيع بالسعر الحالي</button><button className="blue" onClick={negotiate} disabled={busy}>🤝 تفاوض</button><button className="orange" onClick={proposeHigher} disabled={busy}>↗️ اقترح سعرًا آخر</button><button className="secondary" onClick={reject} disabled={busy}>🚫 رفض البيع</button></div></div>:<div className="empty-card"><div>🛒</div><b>لا يوجد زبون أمام الكاشير</b><p>ابدأ استقبال الزبائن أو جهّز البضاعة لرفع فرص البيع.</p><button className="primary wide" onClick={()=>nextFromQueue()} disabled={dayEnded}>استقبال الزبون التالي</button></div>}</section>
+        <section className="panel progression"><PanelTitle icon="⭐" title="تقدم اللاعب"/><div className="level-line"><b>Lv.{level}</b><span>XP {xpProgress}/{xpNeed}</span></div><div className="xp-bar"><i style={{width:`${Math.min(100,xpProgress/xpNeed*100)}%`}}/></div><div className="progress-items"><span>🔓 المنتجات: {visibleProducts.length}</span><span>🔧 تطويرات: {upgrades.filter(u=>u.level>1).length}/{upgrades.length}</span><span>📅 اليوم: {day}/30+</span></div></section>
+      </aside>
+
+      <div className="bottom-grid">
           <section className="panel day-note"><PanelTitle icon="📝" title="مذكرة اليوم"/><div className="metric-list"><div><span>المبيعات</span><b>{sales}ج</b></div><div><span>التكلفة</span><b>{costs}ج</b></div><div><span>الربح</span><b className={profit>=0?'positive':'negative'}>{profit}ج</b></div><div><span>الزبائن</span><b>{served}</b></div><div><span>رفضوا</span><b>{missed}</b></div><div><span>XP</span><b>{xpProgress}/{xpNeed}</b></div></div></section>
           <section className="panel event-log"><PanelTitle icon="📜" title="سجل الأحداث"/><div className="log-list">{notes.slice(-6).reverse().map((n,i)=><p key={i}><span>{i===0?'الآن':`0${Math.max(8,9-i)}:${String(i*7).padStart(2,'0')}`}</span>{n}</p>)}</div></section>
           <section className="panel random-panel"><PanelTitle icon="🎲" title="حدث عشوائي"/><div className="random-content"><div className="random-icon">{event?.icon||'🎲'}</div><b>{event?.name||'لا يوجد حدث نشط'}</b><p>{event?.description||'الأحداث تغيّر الاقتصاد والزبائن والمخزون، وتمنح كل يوم مفاجآت جديدة.'}</p><button className="gold wide" onClick={applyEvent} disabled={!!event||dayEnded}>⚡ إحداث حدث الآن</button></div></section>
           <section className="panel end-panel"><PanelTitle icon="🌙" title="نهاية اليوم"/><div className="end-content"><div className="moon">🌙</div><p>وقت الإغلاق<br/><b>10:30 مساءً</b></p>{dayEnded?<button className="primary wide" onClick={()=>setShowNewDay(true)}>📊 فتح تقرير اليوم</button>:<button className="danger wide" onClick={finishDay}>إنهاء اليوم مبكرًا</button>}</div></section>
         </div>
-        <div className="tip-bar">💡 <b>نصيحة:</b> السعر المنخفض يرفع الرضا، لكن السعر الذكي يحافظ على الربح. طوّر الكاشير لزيادة فرص نجاح التفاوض.</div>
-      </section>
-
-      <aside className="right-column">
-        <section className="panel today-event"><PanelTitle icon={event?.icon||'⚡'} title="حدث اليوم"/><div className="big-event-icon">{event?.icon||'🌤️'}</div><b>{event?.name||'المحل يعمل طبيعيًا'}</b><small>{event?.description||'يمكنك إطلاق حدث عشوائي يدويًا.'}</small></section>
-        <section className="panel customer-panel"><PanelTitle icon="👤" title="الزبون الحالي"/>{customer&&currentProduct?<div className="customer-card"><div className="customer-head"><span>{customer.icon}</span><div><h3>{customer.name}</h3><label>{customer.kind}</label></div></div><div className="customer-stats"><span>💰 الميزانية <b>{customer.budget}</b></span><span>⏳ الصبر <b>{customer.patience}</b></span><span>🧠 حس السعر <b>{customer.priceSense>1.15?'عالية':customer.priceSense<.9?'منخفضة':'متوسطة'}</b></span><span>🤝 تفاوض <b>{Math.round(customer.negotiation*100)}%</b></span></div><div className="need-card"><span>يريد</span><b>{currentProduct.icon} {currentProduct.name}</b><small>السعر المقترح اليوم: {priceFor(currentProduct,day,event)}ج</small></div><label className="field-label">سعر البيع</label><div className="price-control"><input type="number" min={currentProduct.cost+1} value={price} onChange={e=>setPrice(Number(e.target.value))}/><span>ج</span></div><div className="button-stack"><button className="primary" onClick={sell} disabled={busy}>💵 بيع بالسعر الحالي</button><button className="blue" onClick={negotiate} disabled={busy}>🤝 تفاوض</button><button className="orange" onClick={proposeHigher} disabled={busy}>↗️ اقترح سعرًا آخر</button><button className="secondary" onClick={reject} disabled={busy}>🚫 رفض البيع</button></div></div>:<div className="empty-card"><div>🛒</div><b>لا يوجد زبون أمام الكاشير</b><p>ابدأ استقبال الزبائن أو جهّز البضاعة لرفع فرص البيع.</p><button className="primary wide" onClick={()=>nextFromQueue()} disabled={dayEnded}>استقبال الزبون التالي</button></div>}</section>
-        <section className="panel progression"><PanelTitle icon="⭐" title="تقدم اللاعب"/><div className="level-line"><b>Lv.{level}</b><span>XP {xpProgress}/{xpNeed}</span></div><div className="xp-bar"><i style={{width:`${Math.min(100,xpProgress/xpNeed*100)}%`}}/></div><div className="progress-items"><span>🔓 المنتجات: {visibleProducts.length}</span><span>🔧 تطويرات: {upgrades.filter(u=>u.level>1).length}/{upgrades.length}</span><span>📅 اليوم: {day}/30+</span></div></section>
-      </aside>
+      <div className="tip-bar">💡 <b>نصيحة:</b> السعر المنخفض يرفع الرضا، لكن السعر الذكي يحافظ على الربح. طوّر الكاشير لزيادة فرص نجاح التفاوض.</div>
     </div>
 
     {toast&&<div className="toast">{toast}</div>}
