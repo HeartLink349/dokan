@@ -13,6 +13,7 @@ export function useDokanGame() {
   const [toast, setToast] = useState('');
   const [selectedPrice, setSelectedPrice] = useState<PriceChoice>('full');
   const audio = useRef<AudioManager | null>(null);
+  const nextCustomerTimer = useRef<number | null>(null);
 
   useEffect(() => {
     const saved = loadGame();
@@ -63,7 +64,15 @@ export function useDokanGame() {
   }, [announce, transition]);
 
   const leave = useCallback(() => transition(rejectCustomer, 'error'), [transition]);
-  const next = useCallback(() => transition(continueCustomer), [transition]);
+  const next = useCallback(() => {
+    transition(continueCustomer);
+    if (nextCustomerTimer.current) window.clearTimeout(nextCustomerTimer.current);
+    nextCustomerTimer.current = window.setTimeout(() => transition(nextCustomer), GAME_CONFIG.customerExitMs);
+  }, [transition]);
+
+  useEffect(() => () => {
+    if (nextCustomerTimer.current) window.clearTimeout(nextCustomerTimer.current);
+  }, []);
   const closeDay = useCallback(() => transition(finishDay), [transition]);
   const restock = useCallback((productId: string) => {
     const product = game.products.find((item) => item.id === productId);

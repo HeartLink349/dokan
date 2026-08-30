@@ -77,7 +77,6 @@ export default function Home() {
           <img src="/store-scene.jpg" alt="خلفية لعبة دكان الحارة" draggable={false} />
           <div className="scene-shade" />
           {current && <div className={`customer-actor ${current.state.toLowerCase()}`}><span>{current.avatar}</span><b>{current.name}</b></div>}
-          {game.phase === 'playing' && queuePreview.length > 0 && <div className="scene-queue" aria-label="زبائن في انتظار دورهم"><small>في الانتظار</small><div>{queuePreview.slice(0, 2).map((customer, index) => customer && <span key={customer.id} className={`queue-actor queue-${index}`} title={`${customer.name} — ${customer.kind}`}>{customer.avatar}</span>)}</div></div>}
           <div className="scene-status"><span className={game.phase === 'playing' ? 'open-dot' : 'closed-dot'} />{game.phase === 'playing' ? 'المحل مفتوح' : game.phase === 'results' ? 'أُغلق المحل' : 'في انتظار فتح المحل'}</div>
           {current && <div className="dialogue-bubble"><small>{current.name} • {current.kind} • {stateLabel[current.state]}</small><div className="dialogue-body"><p>{current.message}</p>{customerFinished && <button className="dialogue-next" onClick={dokan.next}>التالي ←</button>}</div></div>}
           {!current && game.phase === 'playing' && <div className="scene-message">باب الدكان مفتوح… الزبون التالي في الطريق.</div>}

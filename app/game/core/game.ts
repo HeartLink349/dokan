@@ -164,7 +164,7 @@ export function advanceService(state: GameState): GameState {
 export function continueCustomer(state: GameState): GameState {
   const customer = state.currentCustomer;
   if (!customer || !['SATISFIED', 'LEAVING', 'ANGRY'].includes(customer.state)) return state;
-  return nextCustomer({ ...state, currentCustomer: null });
+  return { ...state, currentCustomer: null };
 }
 
 export function stockout(state: GameState): GameState {
