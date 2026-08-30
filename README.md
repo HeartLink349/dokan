@@ -37,3 +37,11 @@ npm start
 ```
 
 الحفظ يتم محليًا في المتصفح تحت المفتاح `dokan-full-save-v2`.
+
+## Reference-first layout
+
+The game board now follows the supplied landscape reference: fixed three-column desktop layout, large illustrated shop scene in the center, goals/inventory on the left, event/customer/progression on the right, and the day log panels beneath the scene.
+
+On phones the game is intentionally **landscape-first**. In portrait orientation it shows a rotate-device prompt instead of collapsing the game into a tall dashboard.
+
+The existing Next.js + React + TypeScript architecture is preserved; the reference artwork in `public/store-scene.png` remains the scene layer while gameplay state stays interactive in React.
