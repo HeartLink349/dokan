@@ -24,6 +24,7 @@ export default function Home() {
   const remaining = Math.max(0, game.metrics.totalCustomers - progress);
   const queuePreview = game.queue.slice(game.queueIndex, game.queueIndex + 3).map((id) => DAY_ONE_CUSTOMERS.find((customer) => customer.id === id)).filter(Boolean);
   const currentNet = netProfit(game.metrics);
+  const lowStockProducts = game.products.filter((product) => dokan.lowStockIds.includes(product.id));
 
   useEffect(() => {
     const dismiss = (event: KeyboardEvent) => { if (event.key === 'Escape') setModal(null); };
@@ -82,6 +83,7 @@ export default function Home() {
         </div>
         <section className="inventory-dock surface">
           <div className="section-title"><div><h2>🛒 رفوف الدكان</h2><small>توريد سريع: +{GAME_CONFIG.restockAmount} وحدات بسعر التكلفة</small></div><button className="text-button" onClick={() => setModal('inventory')}>إدارة الكل ←</button></div>
+          {lowStockProducts.length > 0 && <div className="stock-radar" role="status"><span>⚠️ مخزون منخفض:</span><div>{lowStockProducts.slice(0, 3).map((product) => <button key={product.id} onClick={() => dokan.restock(product.id)}>{product.icon} {product.name} ({product.stock})</button>)}</div></div>}
           <div className="product-grid">{game.products.map((product) => <ProductTile key={product.id} product={product} money={game.money} low={dokan.lowStockIds.includes(product.id)} onRestock={dokan.restock} />)}</div>
         </section>
       </section>
@@ -89,7 +91,7 @@ export default function Home() {
       <aside className="right-rail">
         <section className="surface customer-panel">
           <div className="section-title"><h2>🧾 الكاشير</h2>{current && <span className={`state-pill ${current.state.toLowerCase()}`}>{stateLabel[current.state]}</span>}</div>
-          {current ? <CustomerCheckout current={current} quote={quote} selected={dokan.selectedPrice} setSelected={dokan.setSelectedPrice} onChoose={dokan.choosePrice} onNegotiate={dokan.negotiate} onLeave={dokan.leave} /> : <EmptyCheckout phase={game.phase} onClose={dokan.closeDay} />}
+          {current ? <CustomerCheckout current={current} products={game.products} quote={quote} selected={dokan.selectedPrice} setSelected={dokan.setSelectedPrice} onChoose={dokan.choosePrice} onNegotiate={dokan.negotiate} onLeave={dokan.leave} onRestock={dokan.restock} /> : <EmptyCheckout phase={game.phase} onClose={dokan.closeDay} />}
         </section>
         <section className="surface feedback-card">
           <div className="section-title"><h2>✨ قراءة المحل</h2></div>
@@ -110,19 +112,28 @@ export default function Home() {
   </main>;
 }
 
-function CustomerCheckout({ current, quote, selected, setSelected, onChoose, onNegotiate, onLeave }: { current: NonNullable<ReturnType<typeof useDokanGame>['game']['currentCustomer']>; quote: ReturnType<typeof getQuote>; selected: PriceChoice; setSelected: (value: PriceChoice) => void; onChoose: (value: PriceChoice) => void; onNegotiate: () => void; onLeave: () => void }) {
+function CustomerCheckout({ current, products, quote, selected, setSelected, onChoose, onNegotiate, onLeave, onRestock }: { current: NonNullable<ReturnType<typeof useDokanGame>['game']['currentCustomer']>; products: Product[]; quote: ReturnType<typeof getQuote>; selected: PriceChoice; setSelected: (value: PriceChoice) => void; onChoose: (value: PriceChoice) => void; onNegotiate: () => void; onLeave: () => void; onRestock: (productId: string) => void }) {
   const ready = ['REQUESTING', 'NEGOTIATING', 'IMPATIENT'].includes(current.state);
+  const unavailable = current.basket.flatMap((line) => {
+    const product = products.find((item) => item.id === line.productId);
+    return product && product.stock < line.quantity ? [{ product, missing: line.quantity - product.stock }] : [];
+  });
+  const selectedPrice = quote[selected];
+  const dealProfit = selectedPrice - quote.cost;
+  const discount = quote.full - selectedPrice;
   return <div className="checkout-content">
     <div className="customer-summary"><span>{current.avatar}</span><div><h3>{current.name}</h3><p>{current.kind} · {current.bio}</p></div></div>
     <div className="meters"><Meter icon="⏳" label="الصبر" value={current.patienceNow} danger={current.patienceNow < 30} /><Meter icon="❤️" label="الرضا" value={current.satisfactionNow} /></div>
     <div className="order-card"><small>الطلب</small><strong>{cartDescriptionFromCustomer(current)}</strong><div><span>الميزانية</span><b>{format(current.budget)} ج</b></div></div>
     {ready ? <>
+      {unavailable.length > 0 && <div className="order-stockout"><b>⚠️ الطلب ناقص من الرف</b><p>{unavailable.map(({ product, missing }) => `${product.icon} ${product.name}: ناقص ${missing}`).join(' • ')}</p><div>{unavailable.map(({ product }) => <button key={product.id} onClick={() => onRestock(product.id)}>📦 توريد {product.name}</button>)}</div></div>}
       <p className="price-heading">اختَر عرضك للزبون</p>
       <div className="price-options">
         <PriceOption id="full" selected={selected} label="السعر الكامل" price={quote.full} note="أعلى هامش ربح" setSelected={setSelected} />
         <PriceOption id="smallDiscount" selected={selected} label="خصم بسيط" price={quote.smallDiscount} note="خصم 8% على المتاح" setSelected={setSelected} />
         <PriceOption id="customerOffer" selected={selected} label="عرض الزبون" price={quote.customerOffer} note="يرفع الرضا غالبًا" setSelected={setSelected} />
       </div>
+      <div className="deal-preview"><span>ربح الصفقة <b className={dealProfit >= 0 ? 'positive' : 'negative'}>{format(dealProfit)} ج</b></span><span>الخصم <b>{format(discount)} ج</b></span></div>
       <button className="primary commit" onClick={() => onChoose(selected)}>💵 إتمام البيع بـ {format(quote[selected])} ج</button>
       <div className="secondary-actions"><button onClick={onNegotiate}>🤝 فصال</button><button onClick={onLeave}>🚫 اعتذر عن البيع</button></div>
     </> : <div className="waiting-action"><span>{current.state === 'ENTERING' ? '🚪' : current.state === 'BROWSING' ? '🔎' : current.state === 'BUYING' ? '🛍️' : current.state === 'PAYING' ? '💳' : '🌟'}</span><p>تتحرك العملية تلقائيًا…</p></div>}

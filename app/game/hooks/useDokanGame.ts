@@ -60,9 +60,21 @@ export function useDokanGame() {
   const leave = useCallback(() => transition(rejectCustomer, 'error'), [transition]);
   const closeDay = useCallback(() => transition(finishDay), [transition]);
   const restock = useCallback((productId: string) => {
+    const product = game.products.find((item) => item.id === productId);
+    if (!product || product.stock >= product.maxStock) {
+      announce('✅ المنتج متوفر بالفعل بالمخزون الكامل.');
+      return;
+    }
+    const amount = Math.min(GAME_CONFIG.restockAmount, product.maxStock - product.stock);
+    const bill = amount * product.cost;
+    if (game.money < bill) {
+      sound('error');
+      announce(`💸 تحتاج ${bill} ج لتوريد ${product.name}.`);
+      return;
+    }
     transition((current) => restockProduct(current, productId));
-    announce('📦 راجع رصيدك؛ تم طلب توريد المنتج إن كانت السيولة كافية.');
-  }, [announce, transition]);
+    announce(`📦 تم توريد ${amount} من ${product.name} مقابل ${bill} ج.`);
+  }, [announce, game.money, game.products, sound, transition]);
 
   const restart = useCallback(() => {
     clearGame();
