@@ -234,7 +234,7 @@ export default function Home(){
 
   return <main className="game" dir="rtl">
     <div className="portrait-warning" aria-hidden="true"><div><span>📱↔️</span><b>لف الموبايل بالعرض</b><small>اللعبة مصممة أفقيًا عشان تشوف المتجر والزبائن وكل لوحات اللعب معًا.</small></div></div>
-    {intro && <div className="overlay"><div className="intro-card"><div className="intro-logo">🏪</div><div className="eyebrow">DOKAN • MARKET SIM</div><h1>دكان الحارة</h1><h2>اليوم {day}</h2><p>ابدأ من محل صغير وابنِ سلسلة ناجحة خلال 30 يومًا وأكثر.</p><div className="intro-grid"><span>💰 رأس المال <b>{money.toLocaleString()}ج</b></span><span>⭐ السمعة <b>{reputation}</b></span><span>🎯 أهداف اليوم <b>{goals.length||4}</b></span><span>🧠 المستوى <b>{level}</b></span></div><button className="primary big" onClick={startDay}>افتح المحل وابدأ اليوم</button><small>يتم الحفظ تلقائيًا على جهازك.</small></div></div>}
+    {intro && <div className="overlay"><div className="intro-card"><div className="intro-logo">🏪</div><div className="eyebrow">DOKAN • MARKET SIM</div><h1>دكان الحارة</h1><h2>اليوم {day}</h2><p>ابدأ من محل صغير وابنِ سلسلة ناجحة خلال 30 يومًا وأكثر.</p><div className="intro-grid"><span>💰 رأس المال <b>{money.toLocaleString()}ج</b></span><span>⭐ السمعة <b>{reputation}</b></span><span>🎯 أهداف اليوم <b>{goals.length||4}</b></span><span>🧠 المستوى <b>{level}</b></span></div><button className="primary big" onClick={() => startDay()}>افتح المحل وابدأ اليوم</button><small>يتم الحفظ تلقائيًا على جهازك.</small></div></div>}
 
     <header className="topbar">
       <div className="brand-card"><div className="brand-icon">📅</div><div><span>محلي</span><strong>اليوم {day}</strong></div></div>
