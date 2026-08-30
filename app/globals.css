@@ -241,3 +241,320 @@ html,body{background:#090b0a}
 
 .stats-row{grid-template-columns:repeat(4,minmax(0,1fr))}
 @media (max-width:1100px) and (orientation:landscape){.stats-row{grid-template-columns:repeat(4,minmax(0,1fr))}}
+
+
+/* ===== FINAL MOBILE PORTRAIT FIX ===== */
+@media (max-width: 700px) and (orientation: portrait){
+  html,body{width:100%;min-width:0;overflow-x:hidden;overflow-y:auto;-webkit-text-size-adjust:100%;}
+  .portrait-warning{display:none!important;}
+  .game{width:100%;min-width:0;padding:6px;background:#0d100f;overflow:hidden;}
+  .topbar{width:100%;display:flex;flex-direction:column;gap:6px;}
+  .brand-card{width:100%;min-height:54px;padding:7px 10px;justify-content:center;}
+  .brand-icon{font-size:28px}.brand-card span{font-size:9px}.brand-card strong{font-size:19px;}
+  .stats-row{width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;}
+  .stat{min-height:54px;padding:6px 4px;}
+  .stat>span{font-size:9px}.stat div{margin-top:2px;gap:4px}.stat b{font-size:18px}.stat strong{font-size:12px;}
+  .top-actions{width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;}
+  .top-actions button{min-height:54px;padding:6px 2px;font-size:19px;}
+  .top-actions span{font-size:9px;}
+  .main-grid{width:100%;max-width:none;margin:7px 0 0;display:flex;flex-direction:column;gap:7px;}
+  .center-column{order:1;width:100%;}
+  .left-column{order:2;width:100%;display:flex;flex-direction:column;gap:7px;}
+  .right-column{order:3;width:100%;display:flex;flex-direction:column;gap:7px;}
+  .left-column .panel+.panel,.right-column .panel+.panel{margin-top:0;}
+  .scene-reference{width:100%;height:auto!important;aspect-ratio:970/625;border-radius:8px;}
+  .scene-reference-image{object-fit:cover;}
+  .scene-dialog{width:min(82%,330px);bottom:11%;}
+  .scene-dialog span{font-size:10px;padding:7px 9px;}
+  .scene-dialog b{font-size:7px;}
+  .scene-welcome{font-size:10px;padding:7px 9px;left:2%;bottom:3%;}
+  .event-badge{max-width:58%;top:6px;left:6px;padding:5px 6px;gap:5px;}
+  .event-badge>span{font-size:19px}.event-badge b{font-size:9px}.event-badge small{font-size:7px;}
+  .panel-title{padding:8px 10px}.panel-title h2{font-size:14px;}
+  .goal{grid-template-columns:24px 1fr 20px;margin:4px;padding:6px;}.goal b{width:21px;height:21px}.goal span{font-size:11px}.goal small{font-size:9px;}
+  .inventory-list{max-height:none;overflow:visible;}
+  .product-row{grid-template-columns:36px minmax(0,1fr) 58px;padding:7px;}
+  .product-icon{font-size:24px}.product-info b{font-size:12px}.product-info small,.product-num small{font-size:9px}.product-num strong{font-size:11px;}
+  .wide{font-size:11px;padding:8px 6px;margin:4px;width:calc(100% - 8px);}
+  .today-event{min-height:0}.big-event-icon{font-size:40px;padding:7px}.today-event>b{font-size:15px}.today-event>small{font-size:10px;padding:4px 10px 10px;}
+  .customer-panel{min-height:0;}
+  .customer-card{padding:9px}.customer-head{gap:8px}.customer-head>span{font-size:54px}.customer-head h3{font-size:18px}.customer-head label{font-size:9px;}
+  .customer-stats{gap:3px;margin:7px 0}.customer-stats span{font-size:9px;padding:4px 0;}
+  .need-card{padding:8px;margin:6px 0}.need-card b{font-size:13px}.need-card small{font-size:9px}.field-label{font-size:9px;}
+  .price-control input,.price-control span{padding:8px;font-size:13px}.button-stack{gap:5px;}
+  .empty-card{padding:22px 12px}.empty-card div{font-size:42px}.empty-card p{font-size:10px;}
+  .progression{padding-bottom:8px}.level-line{font-size:10px;padding:7px 10px 4px}.xp-bar{margin:0 10px}.progress-items{font-size:9px;padding:7px 10px;}
+  .bottom-grid{order:4;width:100%;display:grid;grid-template-columns:1fr;gap:7px;margin-top:0;}
+  .bottom-grid .panel{min-height:0;}
+  .metric-list{padding:6px 10px}.metric-list div{font-size:10px;padding:6px 0;}
+  .log-list p{font-size:9px;padding:6px;}
+  .random-content,.end-content{padding:9px}.random-content p,.end-content p{font-size:10px;min-height:auto;}
+  .random-icon,.moon{font-size:34px;}
+  .tip-bar{order:5;width:100%;margin-top:0;padding:7px;font-size:9px;line-height:1.6;}
+  .overlay,.modal-backdrop{padding:8px;}
+  .intro-card,.report-card{width:calc(100vw - 16px);max-width:520px;padding:18px 12px;border-width:3px;border-radius:14px;max-height:94vh;overflow:auto;}
+  .intro-logo,.report-icon{font-size:52px}.intro-card h1,.report-card h2{font-size:27px}.intro-card p,.report-card>p{font-size:11px;line-height:1.7;}
+  .intro-grid,.report-grid{grid-template-columns:1fr 1fr;gap:5px;margin:12px 0}.intro-grid span,.report-grid div{padding:7px;font-size:10px}.intro-grid b,.report-grid b{font-size:14px;}
+  .big{font-size:14px;padding:11px 14px;}
+  .modal{width:calc(100vw - 12px);max-height:94vh;border-radius:10px;}
+  .modal-head{padding:9px 11px}.modal-head h2{font-size:15px}.modal-head button{font-size:19px;}
+  .modal-list,.upgrade-grid,.menu-grid{grid-template-columns:1fr;padding:8px;gap:6px;}
+  .modal-product{grid-template-columns:38px minmax(0,1fr) auto;padding:7px}.modal-product>span{font-size:26px}.modal-product b{font-size:12px}.modal-product small{font-size:9px;}
+  .upgrade-card{padding:9px}.upgrade-top>span{font-size:31px}.upgrade-card p{font-size:10px;min-height:0;}
+  .paper{margin:8px;padding:14px;min-height:360px;font-size:11px;}
+  .report-list{padding:9px;gap:5px}.report-list div{padding:9px;font-size:11px;}
+  .goal-big{grid-template-columns:38px minmax(0,1fr) 65px;padding:8px;gap:6px}.goal-big>span{font-size:25px}.goal-big b{font-size:11px}.goal-big>strong{font-size:9px;}
+  .menu-grid button{padding:12px;font-size:11px;}
+}
+
+@media (max-width:380px) and (orientation: portrait){
+  .game{padding:4px}.stats-row{gap:4px}.stat{min-height:50px}.stat b{font-size:16px}.stat strong{font-size:10px}.top-actions button{min-height:50px;font-size:17px}.top-actions span{font-size:8px}
+  .scene-dialog{width:86%;bottom:10%}.scene-dialog span{font-size:9px}.scene-welcome{font-size:9px;padding:6px 7px}
+  .panel-title h2{font-size:13px}.customer-head>span{font-size:48px}.customer-head h3{font-size:16px}.button-stack button{font-size:11px;padding:8px 5px}
+}
+
+/* =========================================================
+   FINAL MOBILE LANDSCAPE FIX
+   Keep the entire Dokan board horizontal on phones.
+   ========================================================= */
+@media (max-width: 900px) and (orientation: landscape) {
+  html, body {
+    width: 100%;
+    min-width: 100%;
+    margin: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .game {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    padding: 4px;
+    overflow-x: hidden;
+  }
+
+  /* Compact horizontal HUD */
+  .topbar {
+    width: 100%;
+    max-width: none;
+    display: grid;
+    grid-template-columns: 132px minmax(0, 1fr) 148px;
+    gap: 4px;
+    align-items: stretch;
+  }
+
+  .brand-card,
+  .stat,
+  .top-actions button {
+    min-height: 58px;
+    height: 58px;
+  }
+
+  .brand-card {
+    padding: 4px 6px;
+    gap: 6px;
+  }
+  .brand-icon { font-size: 22px; }
+  .brand-card span { font-size: 8px; }
+  .brand-card strong { font-size: 15px; }
+
+  .stats-row {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 3px;
+    min-width: 0;
+  }
+  .stat {
+    padding: 4px 2px;
+    border-radius: 6px;
+    min-width: 0;
+  }
+  .stat > span { font-size: 7px; }
+  .stat div { gap: 2px; margin-top: 2px; min-width: 0; }
+  .stat b { font-size: 14px; }
+  .stat strong {
+    font-size: 9px;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .stats-row .stat:nth-child(5) { display: none; }
+
+  .top-actions {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 3px;
+    min-width: 0;
+  }
+  .top-actions button {
+    padding: 3px 2px;
+    font-size: 16px;
+    border-radius: 6px;
+  }
+  .top-actions span { font-size: 7px; }
+
+  /* Three columns: inventory | scene | customer */
+  .main-grid {
+    width: 100%;
+    max-width: none;
+    margin: 4px 0 0;
+    display: grid;
+    grid-template-columns: 154px minmax(0, 1fr) 168px;
+    grid-template-rows: auto auto auto;
+    grid-template-areas:
+      "left center right"
+      "left bottom bottom"
+      "left tip tip";
+    gap: 4px;
+    align-items: start;
+  }
+
+  .left-column,
+  .center-column,
+  .right-column,
+  .bottom-grid,
+  .tip-bar {
+    min-width: 0;
+  }
+
+  .left-column { grid-area: left; }
+  .center-column { grid-area: center; }
+  .right-column { grid-area: right; }
+
+  .panel { border-radius: 6px; }
+  .panel + .panel { margin-top: 4px; }
+  .panel-title { padding: 5px 7px; }
+  .panel-title h2 { font-size: 10px; }
+  .panel-title span { font-size: 7px; padding: 2px 4px; }
+
+  .goal {
+    grid-template-columns: 17px minmax(0,1fr) 12px;
+    gap: 3px;
+    margin: 3px;
+    padding: 3px;
+  }
+  .goal b { width: 16px; height: 16px; font-size: 9px; }
+  .goal span { font-size: 7px; }
+  .goal small { font-size: 6px; margin-top: 1px; }
+
+  .inventory-list { max-height: 235px; }
+  .product-row {
+    grid-template-columns: 24px minmax(0,1fr) 37px;
+    gap: 3px;
+    padding: 4px;
+  }
+  .product-icon { font-size: 17px; }
+  .product-info { min-width: 0; }
+  .product-info b {
+    font-size: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .product-info small,
+  .product-num small { font-size: 6px; }
+  .product-num strong { font-size: 8px; padding: 2px 4px; }
+
+  .wide {
+    font-size: 8px;
+    padding: 5px 3px;
+    margin: 3px 4px;
+    width: calc(100% - 8px);
+  }
+
+  /* Scene always keeps its original landscape artwork ratio */
+  .scene-reference {
+    width: 100%;
+    height: auto !important;
+    aspect-ratio: 970 / 625;
+    min-height: 0;
+    border-radius: 7px;
+  }
+  .scene-reference-image { width: 100%; height: 100%; object-fit: cover; }
+  .scene-dialog { width: min(230px, 48%); bottom: 5%; }
+  .scene-dialog span { font-size: 7px; padding: 5px 7px; }
+  .scene-dialog b { font-size: 6px; padding: 3px 6px; }
+  .scene-welcome { font-size: 8px; padding: 5px 7px; bottom: 3%; left: 2%; }
+  .event-badge { top: 4px; left: 4px; padding: 3px 5px; max-width: 48%; gap: 4px; }
+  .event-badge > span { font-size: 15px; }
+  .event-badge b { font-size: 7px; }
+  .event-badge small { font-size: 5px; }
+
+  /* Customer panel */
+  .customer-panel { min-height: 0; }
+  .customer-card { padding: 6px; }
+  .customer-head { gap: 5px; }
+  .customer-head > span { font-size: 38px; }
+  .customer-head h3 { font-size: 12px; }
+  .customer-head label { font-size: 6px; padding: 2px 4px; }
+  .customer-stats { gap: 1px; margin: 5px 0; }
+  .customer-stats span { font-size: 6px; padding: 3px 0; }
+  .need-card { padding: 5px; margin: 4px 0; }
+  .need-card span { font-size: 6px; }
+  .need-card b { font-size: 9px; margin: 2px 0; }
+  .need-card small { font-size: 6px; }
+  .field-label { font-size: 6px; margin-top: 4px; }
+  .price-control input,
+  .price-control span { padding: 5px; font-size: 9px; }
+  .button-stack { gap: 3px; margin-top: 4px; }
+  .button-stack button { padding: 5px 3px; font-size: 8px; }
+  .empty-card { padding: 12px 5px; }
+  .empty-card div { font-size: 28px; }
+  .empty-card b { font-size: 9px; margin: 4px; }
+  .empty-card p { font-size: 7px; }
+
+  .today-event { min-height: 0; }
+  .big-event-icon { font-size: 26px; padding: 3px; }
+  .today-event > b { font-size: 9px; }
+  .today-event > small { font-size: 6px; padding: 3px 5px 6px; }
+
+  .progression { display: none !important; }
+
+  /* Four summary cards remain horizontal under the scene */
+  .bottom-grid {
+    grid-area: bottom;
+    display: grid;
+    grid-template-columns: 1fr 1.35fr 1fr 1fr;
+    gap: 4px;
+    margin-top: 0;
+  }
+  .bottom-grid .panel { min-height: 100px; }
+  .metric-list { padding: 4px 6px; }
+  .metric-list div { font-size: 7px; padding: 3px 0; }
+  .log-list { padding: 3px; }
+  .log-list p { font-size: 6px; padding: 3px; margin: 2px 0; }
+  .random-content,
+  .end-content { padding: 5px; }
+  .random-icon,
+  .moon { font-size: 25px; }
+  .random-content p,
+  .end-content p { font-size: 6px; line-height: 1.4; min-height: 22px; }
+  .tip-bar { grid-area: tip; margin-top: 0; padding: 4px; font-size: 7px; }
+
+  /* Landscape only: never show the portrait blocker */
+  .portrait-warning { display: none !important; }
+}
+
+/* Very short landscape phones (e.g. 640x360 / 800x360). */
+@media (max-width: 900px) and (orientation: landscape) and (max-height: 420px) {
+  .game { padding: 3px; }
+  .topbar { grid-template-columns: 118px minmax(0,1fr) 132px; gap: 3px; }
+  .brand-card, .stat, .top-actions button { min-height: 50px; height: 50px; }
+  .brand-icon { font-size: 19px; }
+  .brand-card strong { font-size: 13px; }
+  .stat > span { font-size: 6px; }
+  .stat b { font-size: 12px; }
+  .stat strong { font-size: 8px; }
+  .top-actions button { font-size: 14px; }
+  .top-actions span { font-size: 6px; }
+
+  .main-grid { grid-template-columns: 140px minmax(0,1fr) 150px; gap: 3px; margin-top: 3px; }
+  .inventory-list { max-height: 190px; }
+  .scene-reference { aspect-ratio: 970 / 625; }
+  .bottom-grid { grid-template-columns: 1fr 1.25fr 1fr 1fr; gap: 3px; }
+  .bottom-grid .panel { min-height: 82px; }
+  .panel-title { padding: 4px 5px; }
+  .panel-title h2 { font-size: 9px; }
+  .customer-head > span { font-size: 32px; }
+  .customer-head h3 { font-size: 10px; }
+  .button-stack button { padding: 4px 2px; font-size: 7px; }
+}
