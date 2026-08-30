@@ -1,24 +1,19 @@
-# دكان الحارة — Full Gameplay Upgrade
+# دكان الحارة — Reference-Matched Landscape Build
 
-لعبة متجر/بقالة مبنية على Next.js + TypeScript، مطورة فوق المشروع الأصلي بدون تغيير التقنية.
+نسخة Next.js + React + TypeScript من لعبة دكان الحارة، مع ضبط الواجهة لتتبع صورة الـ reference المرفقة كهدف بصري أساسي.
 
-## الأنظمة المضافة
-- أيام متتالية قابلة للتمديد (Day 1 → 30+).
-- زبائن متعددون بخصائص مختلفة وصبر وميزانية وحس سعر واحتمال تفاوض.
-- بيع حقيقي مرتبط بالمخزون والمال والتكلفة والربح والسمعة.
-- تفاوض واقتراح أسعار ورفض البيع مع تأثير على رضا الزبون.
-- اقتصاد يومي وأسعار متغيرة وأحداث تؤثر على الطلب والتكلفة والمخزون.
-- مخزون وإعادة تخزين مع خصومات الموردين.
-- 12 منتجًا مع فتح تدريجي حسب المستوى.
-- 7 تطويرات للمتجر بمستويات وتأثيرات Gameplay.
-- Reputation + XP + Levels وفتح محتوى تدريجي.
-- أهداف يومية ومكافآت مال/XP/سمعة.
-- تقرير نهاية اليوم والانتقال لليوم التالي.
-- حفظ تلقائي في localStorage مع Continue / Reset Save.
-- أحداث عشوائية: كهرباء، مطر، مورد، ازدحام، نقص سوق، تلف، VIP، تخفيضات.
-- Responsive UI للهاتف والتابلت والكمبيوتر.
-- Animations خفيفة وإشعارات وتفاعل بصري.
-- لوحة مذكرة، مخزون، تطويرات، إحصائيات وأهداف.
+## ما تم ضبطه
+
+- تخطيط أفقي ثابت بثلاثة أعمدة: أهداف/متجر — مشهد الدكان — حدث/زبون.
+- مشهد الدكان يستخدم `public/store-scene.png` كطبقة الرسم الأساسية.
+- لوحات الأهداف، المنتجات، الزبون، الأزرار، البطاقات، الحدود، الألوان، والمسافات مضبوطة لتقارب الـ reference.
+- صف الإحصائيات العلوي أصبح 4 بطاقات مثل المرجع: الوقت، رأس المال، الربح، السمعة.
+- قائمة المنتجات تبدأ بـ 8 منتجات الظاهرة في المرجع.
+- الزبون الأول في اليوم الأول هو «كريم» وببيانات قريبة من المرجع.
+- أهداف اليوم أصبحت 3 بطاقات مثل المرجع.
+- الصف السفلي يمتد تحت المشهد والعمود الأيمن مثل المرجع.
+- عند فتح اللعبة على الهاتف بالطول تظهر رسالة تدوير الجهاز بدل تحويل اللعبة إلى Dashboard عمودي.
+- الوظائف التفاعلية الأصلية محفوظة: البيع، التفاوض، تغيير السعر، رفض البيع، الأحداث، التخزين، التطويرات، XP، الحفظ المحلي، وتقارير نهاية اليوم.
 
 ## التشغيل
 
@@ -36,12 +31,11 @@ npm run build
 npm start
 ```
 
-الحفظ يتم محليًا في المتصفح تحت المفتاح `dokan-full-save-v2`.
+الحفظ المحلي تحت المفتاح `dokan-full-save-v2`.
 
-## Reference-first layout
+## الملفات المهمة
 
-The game board now follows the supplied landscape reference: fixed three-column desktop layout, large illustrated shop scene in the center, goals/inventory on the left, event/customer/progression on the right, and the day log panels beneath the scene.
-
-On phones the game is intentionally **landscape-first**. In portrait orientation it shows a rotate-device prompt instead of collapsing the game into a tall dashboard.
-
-The existing Next.js + React + TypeScript architecture is preserved; the reference artwork in `public/store-scene.png` remains the scene layer while gameplay state stays interactive in React.
+- `public/reference.png` — صورة المرجع الكاملة.
+- `public/store-scene.png` — صورة مشهد الدكان المستخدمة داخل اللعبة.
+- `app/page.tsx` — منطق اللعبة والـ UI.
+- `app/globals.css` — تخطيط الـ reference والـ responsive landscape.
