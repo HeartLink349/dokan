@@ -8,7 +8,7 @@ import { averageSatisfaction, bestAndWorstProducts, cartDescription, getQuote, n
 import { useDokanGame } from './game/hooks/useDokanGame';
 import type { CustomerState, PriceChoice, Product } from './game/types';
 
-type ModalName = 'inventory' | 'settings' | 'guide' | null;
+type ModalName = 'inventory' | 'settings' | 'guide' | 'memo' | null;
 
 const stateLabel: Record<CustomerState, string> = {
   ENTERING: 'داخل المحل', WAITING: 'ينتظر', BROWSING: 'يتفقد الرفوف', REQUESTING: 'يطلب', NEGOTIATING: 'يفاصل', BUYING: 'تجهيز الطلب', PAYING: 'يدفع', SATISFIED: 'راضٍ', IMPATIENT: 'نفد صبره', ANGRY: 'غاضب', LEAVING: 'يغادر',
@@ -49,7 +49,7 @@ export default function Home() {
         <TopMetric icon="📈" label="الربح" value={`${format(currentNet)} ج`} tone={currentNet >= 0 ? 'positive' : 'negative'} />
         <TopMetric icon="⭐" label="السمعة" value={`${game.reputation}`} sub={`/100 · ${averageSatisfaction(game)}% رضا`} />
         <nav className="top-actions" aria-label="قائمة التحكم">
-          <button onClick={() => setModal('guide')} title="المذكرة وطريقة اللعب"><span>📋</span>المذكرة</button>
+          <button onClick={() => setModal('memo')} title="مذكرة اليوم"><span>📋</span>المذكرة</button>
           <button onClick={() => setModal('settings')} title="الإعدادات"><span>⚙️</span>الإعدادات</button>
           <button onClick={() => setModal('inventory')} title="قائمة المخزون"><span>☰</span>القائمة</button>
         </nav>
@@ -100,7 +100,8 @@ export default function Home() {
     {game.phase === 'results' && <Results game={game} onRestart={dokan.restart} />}
     {modal === 'inventory' && <Modal title="تجهيز البضائع" close={() => setModal(null)}><InventoryModal products={game.products} money={game.money} onRestock={dokan.restock} lowIds={dokan.lowStockIds} /></Modal>}
     {modal === 'settings' && <Modal title="الإعدادات" close={() => setModal(null)}><Settings game={game} updateAudio={dokan.updateAudio} updateQuality={dokan.updateQuality} /></Modal>}
-    {modal === 'guide' && <Modal title="مذكرة اليوم وطريقة اللعب" close={() => setModal(null)}><Guide /></Modal>}
+    {modal === 'memo' && <Modal title="مذكرة اليوم" close={() => setModal(null)}><DayMemo game={game} /></Modal>}
+    {modal === 'guide' && <Modal title="طريقة اللعب" close={() => setModal(null)}><Guide /></Modal>}
   </main>;
 }
 
@@ -110,7 +111,9 @@ function Objective({ done, text }: { done: boolean; text: string }) { return <di
 
 function StorePanel({ products, money, lowIds, onRestock, onManage }: { products: Product[]; money: number; lowIds: string[]; onRestock: (id: string) => void; onManage: () => void }) {
   const stocked = products.filter((product) => product.stock > 0);
-  const display = (stocked.length ? stocked : products).slice(0, 9);
+  // Once the player starts stocking items, the rest of the catalogue must
+  // remain reachable for future purchases as well.
+  const display = products;
   return <section className="panel store-panel"><PanelTitle icon="📦" title="المتجر" /><div className="store-subtitle"><span>المنتجات ({stocked.length}/{products.length})</span><button onClick={onManage}>عرض الكل</button></div><div className="store-list">{display.map((product) => { const amount = Math.min(GAME_CONFIG.restockAmount, product.maxStock - product.stock); const bill = amount * product.cost; return <article className={`store-row ${lowIds.includes(product.id) ? 'low-stock' : ''}`} key={product.id}><span>{product.icon}</span><div><strong>{product.name}</strong><small>سعر {format(product.price)} · تكلفة {format(product.cost)}</small></div><button disabled={!amount || money < bill} onClick={() => onRestock(product.id)} title={`توريد ${product.name}`}>{product.stock || `+${amount}`}</button></article>; })}</div><button className="stock-button" onClick={onManage}>📦 تجهيز البضائع</button></section>;
 }
 
@@ -138,6 +141,7 @@ function PriceOption({ id, selected, label, price, setSelected }: { id: PriceCho
 function EmptyCheckout({ phase }: { phase: string }) { return <div className="empty-checkout"><span>{phase === 'results' ? '🌙' : '🧍'}</span><h3>{phase === 'results' ? 'انتهى اليوم' : 'لا يوجد زبائن حاليًا'}</h3><p>{phase === 'playing' ? 'الزبون التالي يصل خلال لحظات.' : 'جهّز المنتجات ثم افتح الدكان.'}</p></div>; }
 
 function InventoryModal({ products, money, onRestock, lowIds }: { products: Product[]; money: number; onRestock: (id: string) => void; lowIds: string[] }) { return <div className="inventory-modal">{products.map((product) => { const amount = Math.min(GAME_CONFIG.restockAmount, product.maxStock - product.stock); return <div className="inventory-row" key={product.id}><span>{product.icon}</span><div><strong>{product.name}</strong><small>{product.category} · {product.brand} · جودة {product.quality}/100</small><p>سعر البيع {format(product.price)}ج · التكلفة {format(product.cost)}ج {lowIds.includes(product.id) && <b className="stock-warning">⚠️ مخزون منخفض</b>}</p></div><div className="stock-control"><b>{product.stock}/{product.maxStock}</b><button disabled={product.stock >= product.maxStock || money < amount * product.cost} onClick={() => onRestock(product.id)}>توريد +{amount}</button></div></div>; })}</div>; }
+function DayMemo({ game }: { game: ReturnType<typeof useDokanGame>['game'] }) { const progress = game.metrics.served + game.metrics.left; const next = game.queue[game.queueIndex] ? DAY_ONE_CUSTOMERS.find((customer) => customer.id === game.queue[game.queueIndex]) : undefined; return <div className="day-memo"><div className="memo-highlight"><span>📅</span><div><strong>اليوم الأول · محل الحارة</strong><p>{game.phase === 'intro' ? 'جهّز الرفوف قبل فتح الباب.' : `تم التعامل مع ${progress} من ${game.metrics.totalCustomers} زبونًا.`}</p></div></div><div className="memo-stats"><div><small>السيولة</small><b>{format(game.money)} ج</b></div><div><small>صافي الربح</small><b className={netProfit(game.metrics) >= 0 ? 'positive' : 'negative'}>{format(netProfit(game.metrics))} ج</b></div><div><small>السمعة</small><b>{game.reputation}/100</b></div><div><small>الرضا</small><b>{averageSatisfaction(game)}%</b></div></div><div className="memo-goals"><p><span>{netProfit(game.metrics) >= 250 ? '✓' : '○'}</span> حقق ربحًا لا يقل عن 250 ج</p><p><span>{game.reputation >= 40 ? '✓' : '○'}</span> لا تنخفض السمعة عن 40</p><p><span>{game.products.filter((item) => item.stock > 0).length >= 8 ? '✓' : '○'}</span> جهّز 8 منتجات على الأقل</p></div>{next && <div className="memo-next"><span>{next.avatar}</span><p>القادم: <b>{next.name}</b><small>{next.kind} · {next.bio}</small></p></div>}</div>; }
 function Settings({ game, updateAudio, updateQuality }: { game: ReturnType<typeof useDokanGame>['game']; updateAudio: (field: 'master' | 'music' | 'sfx' | 'muted', value: number | boolean) => void; updateQuality: (quality: keyof typeof QUALITY_LABELS) => void }) { return <div className="settings-panel"><button className="sound-toggle" onClick={() => updateAudio('muted', !game.audio.muted)}>{game.audio.muted ? '🔇 تفعيل الصوت' : '🔊 كتم الصوت'}</button><Slider label="الصوت العام" value={game.audio.master} onChange={(value) => updateAudio('master', value)} /><Slider label="الموسيقى" value={game.audio.music} onChange={(value) => updateAudio('music', value)} /><Slider label="المؤثرات" value={game.audio.sfx} onChange={(value) => updateAudio('sfx', value)} /><label className="quality-select">جودة الأداء<select value={game.settings.quality} onChange={(event) => updateQuality(event.target.value as keyof typeof QUALITY_LABELS)}>{Object.entries(QUALITY_LABELS).map(([value, label]) => <option value={value} key={value}>{label}</option>)}</select></label></div>; }
 function Slider({ label, value, onChange }: { label: string; value: number; onChange: (value: number) => void }) { return <label className="range-label">{label}<b>{value}%</b><input type="range" min="0" max="100" value={value} onChange={(event) => onChange(Number(event.target.value))} /></label>; }
 function Guide() { return <div className="guide"><p><b>1.</b> ابدأ بشراء المخزون من «تجهيز البضائع»؛ الرف الفارغ يضيّع المبيعات.</p><p><b>2.</b> راقب الميزانية والصبر قبل اختيار السعر.</p><p><b>3.</b> السعر الحالي يربح أكثر، والخصم أو الفصال يرفعان الرضا غالبًا.</p><p><b>4.</b> بعد كل عملية ستظل رسالة الزبون حتى تضغط «التالي».</p><p><b>5.</b> مفاتيح الكمبيوتر: Enter للبيع، Space للفصال، والأسهم لتغيير السعر.</p></div>; }
