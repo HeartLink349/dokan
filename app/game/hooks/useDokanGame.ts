@@ -3,13 +3,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { GAME_CONFIG } from '../config';
 import { AudioManager } from '../core/audio';
-import { advanceService, beginNegotiation, continueCustomer, createNewGame, customerReady, customerRequests, customerWaits, finishDay, nextCustomer, priceChoice, rejectCustomer, restartDayOne, restockProduct, tickPatience } from '../core/game';
+import { acknowledgeDay2Update, advanceService, beginNegotiation, continueCustomer, createNewGame, customerReady, customerRequests, customerWaits, findAlternative, finishDay, getMarketPrice, nextCustomer, offerAlternative, priceChoice, rejectCustomer, restartDayOne, restockProduct, restoreGame, startNextDay, supplierAction, tickPatience } from '../core/game';
 import { clearGame, loadGame, saveGame } from '../core/save';
-import type { GameState, PriceChoice, Quality } from '../types';
+import type { GameState, PriceChoice, Quality, SupplierChoice } from '../types';
 
 export function useDokanGame() {
   const [game, setGame] = useState<GameState>(createNewGame);
   const [hydrated, setHydrated] = useState(false);
+  const [hasSavedGame, setHasSavedGame] = useState(false);
   const [toast, setToast] = useState('');
   const [selectedPrice, setSelectedPrice] = useState<PriceChoice>('full');
   const audio = useRef<AudioManager | null>(null);
@@ -17,12 +18,7 @@ export function useDokanGame() {
 
   useEffect(() => {
     const saved = loadGame();
-    if (saved?.version === 2) {
-      setGame({
-        ...saved,
-        metrics: { ...saved.metrics, satisfactionTotal: saved.metrics.satisfactionTotal ?? 0 },
-      });
-    }
+    if (saved) { setGame(restoreGame(saved)); setHasSavedGame(true); }
     setHydrated(true);
   }, []);
 
@@ -81,7 +77,7 @@ export function useDokanGame() {
       return;
     }
     const amount = Math.min(GAME_CONFIG.restockAmount, product.maxStock - product.stock);
-    const bill = amount * product.cost;
+    const bill = amount * getMarketPrice(game, product).cost;
     if (game.money < bill) {
       sound('error');
       announce(`💸 تحتاج ${bill} ج لتوريد ${product.name}.`);
@@ -97,6 +93,20 @@ export function useDokanGame() {
     transition(restartDayOne);
     announce('🔄 بدأ يوم أول جديد بحالة نظيفة.');
   }, [announce, transition]);
+
+  const beginDayTwo = useCallback(() => {
+    transition(startNextDay);
+    announce('🚀 اليوم الثاني جاهز: راقب السوق قبل ما تجهّز الرفوف.');
+  }, [announce, transition]);
+  const seeDayTwoUpdate = useCallback(() => transition(acknowledgeDay2Update), [transition]);
+  const suggestAlternative = useCallback(() => {
+    const alternative = findAlternative(game);
+    transition(offerAlternative);
+    announce(alternative ? `🔁 عرضت ${alternative.name} كبديل.` : '⚠️ لا يوجد بديل مناسب متاح الآن.');
+  }, [announce, game, transition]);
+  const negotiateSupplier = useCallback((choice: SupplierChoice) => {
+    transition((current) => supplierAction(current, choice), choice === 'decline' ? 'error' : 'click');
+  }, [transition]);
 
   const updateAudio = useCallback((field: 'master' | 'music' | 'sfx' | 'muted', value: number | boolean) => {
     setGame((current) => ({ ...current, audio: { ...current.audio, [field]: value } }));
@@ -142,5 +152,5 @@ export function useDokanGame() {
   }, [choosePrice, game.currentCustomer, negotiate, next, selectedPrice]);
 
   const lowStockIds = useMemo(() => game.products.filter((product) => product.stock > 0 && product.stock <= GAME_CONFIG.lowStockThreshold).map((product) => product.id), [game.products]);
-  return { game, hydrated, toast, selectedPrice, setSelectedPrice, open, choosePrice, negotiate, leave, next, closeDay, restock, restart, updateAudio, updateQuality, lowStockIds };
+  return { game, hydrated, hasSavedGame, toast, selectedPrice, setSelectedPrice, open, choosePrice, negotiate, leave, next, closeDay, restock, restart, beginDayTwo, seeDayTwoUpdate, suggestAlternative, negotiateSupplier, updateAudio, updateQuality, lowStockIds };
 }

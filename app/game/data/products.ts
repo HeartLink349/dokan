@@ -41,4 +41,13 @@ export const PRODUCT_CATALOG: Product[] = [
   { id: 'ice-cream', name: 'آيس كريم', category: 'فريزر', brand: 'دولسي', icon: '🍨', price: 30, cost: 19, stock: 0, maxStock: 14, popularity: 61, quality: 78, discountable: true },
   { id: 'coffee', name: 'قهوة سريعة', category: 'مشروبات', brand: 'نسكافيه', icon: '☕', price: 40, cost: 28, stock: 0, maxStock: 14, popularity: 60, quality: 88, discountable: false },
   { id: 'dates', name: 'تمر', category: 'حلويات', brand: 'الواحة', icon: '🌴', price: 36, cost: 25, stock: 0, maxStock: 14, popularity: 49, quality: 82, discountable: true },
+  // Day 2 stock: these are unlocked only after the Day 1 summary.
+  { id: 'instant-noodles', name: 'نودلز سريعة', category: 'أساسيات', brand: 'إندومي', icon: '🍜', price: 22, cost: 12, stock: 0, maxStock: 24, popularity: 86, quality: 71, discountable: true, availableFromDay: 2 },
+  { id: 'honey', name: 'عسل نحل', category: 'حلويات', brand: 'وادي النحل', icon: '🍯', price: 88, cost: 63, stock: 0, maxStock: 10, popularity: 58, quality: 92, discountable: false, availableFromDay: 2 },
+  { id: 'premium-coffee', name: 'قهوة بريميوم', category: 'مشروبات', brand: 'دافيدوف', icon: '☕', price: 76, cost: 54, stock: 0, maxStock: 10, popularity: 54, quality: 96, discountable: false, availableFromDay: 2 },
+  { id: 'diapers', name: 'حفاضات أطفال', category: 'منزل', brand: 'بيبي جوي', icon: '🧷', price: 145, cost: 110, stock: 0, maxStock: 8, popularity: 61, quality: 89, discountable: false, availableFromDay: 2 },
+  { id: 'tahini', name: 'طحينة', category: 'أساسيات', brand: 'الخلطة', icon: '🥣', price: 64, cost: 46, stock: 0, maxStock: 12, popularity: 66, quality: 84, discountable: true, availableFromDay: 2 },
+  { id: 'sunflower-seeds', name: 'لب سوري', category: 'سناكس', brand: 'تسالي', icon: '🌻', price: 15, cost: 7, stock: 0, maxStock: 28, popularity: 74, quality: 68, discountable: true, availableFromDay: 2 },
+  { id: 'batteries', name: 'بطاريات قلم', category: 'منزل', brand: 'إيفريدي', icon: '🔋', price: 32, cost: 19, stock: 0, maxStock: 16, popularity: 47, quality: 86, discountable: false, availableFromDay: 2 },
+  { id: 'corn', name: 'ذرة حلوة', category: 'معلبات', brand: 'حدائق', icon: '🌽', price: 29, cost: 18, stock: 0, maxStock: 16, popularity: 52, quality: 78, discountable: true, availableFromDay: 2 },
 ];

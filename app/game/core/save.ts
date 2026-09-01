@@ -4,7 +4,8 @@ import type { GameState } from '../types';
 export function loadGame(): GameState | null {
   if (typeof window === 'undefined') return null;
   try {
-    const value = localStorage.getItem(GAME_CONFIG.saveKey);
+    const keys = [GAME_CONFIG.saveKey, ...GAME_CONFIG.legacySaveKeys];
+    const value = keys.map((key) => localStorage.getItem(key)).find(Boolean);
     return value ? JSON.parse(value) as GameState : null;
   } catch { return null; }
 }
@@ -15,5 +16,6 @@ export function saveGame(state: GameState) {
 }
 
 export function clearGame() {
-  if (typeof window !== 'undefined') localStorage.removeItem(GAME_CONFIG.saveKey);
+  if (typeof window === 'undefined') return;
+  [GAME_CONFIG.saveKey, ...GAME_CONFIG.legacySaveKeys].forEach((key) => localStorage.removeItem(key));
 }

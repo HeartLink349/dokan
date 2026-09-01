@@ -1,5 +1,5 @@
 export type ProductCategory = 'مشروبات' | 'سناكس' | 'أساسيات' | 'منزل' | 'حلويات' | 'ألبان' | 'معلبات' | 'مخبوزات' | 'تنظيف' | 'تجميل' | 'فريزر';
-export type CustomerKind = 'الحاج' | 'فصال' | 'ربة بيت' | 'طفل' | 'مستعجل' | 'عصبي' | 'سعر' | 'جودة' | 'موظف' | 'عميل دائم';
+export type CustomerKind = 'الحاج' | 'فصال' | 'ربة بيت' | 'طفل' | 'مستعجل' | 'عصبي' | 'سعر' | 'جودة' | 'موظف' | 'عميل دائم' | 'اقتصادي' | 'تاجر جملة' | 'باحث عن جودة' | 'صياد عروض';
 export type CustomerState = 'ENTERING' | 'WAITING' | 'BROWSING' | 'REQUESTING' | 'NEGOTIATING' | 'BUYING' | 'PAYING' | 'SATISFIED' | 'IMPATIENT' | 'ANGRY' | 'LEAVING';
 export type GamePhase = 'intro' | 'opening' | 'playing' | 'results';
 export type Quality = 'low' | 'medium' | 'high';
@@ -17,6 +17,9 @@ export type Product = {
   popularity: number;
   quality: number;
   discountable: boolean;
+  availableFromDay?: number;
+  /** Weighted procurement cost of the units currently on the shelf. */
+  unitCost?: number;
 };
 
 export type CartLine = { productId: string; quantity: number };
@@ -44,8 +47,39 @@ export type ActiveCustomer = CustomerProfile & {
   patienceNow: number;
   satisfactionNow: number;
   negotiationRound: number;
+  substitutionTried?: boolean;
   message: string;
 };
+
+export type MarketTrend = 'low' | 'normal' | 'high';
+
+export type DayEvent = {
+  id: string;
+  icon: string;
+  title: string;
+  description: string;
+  productId: string;
+  trend: MarketTrend;
+  buyMultiplier: number;
+  sellMultiplier: number;
+  demandMessage: string;
+};
+
+export type MarketState = { activeEvent: DayEvent | null };
+
+export type SupplierOfferStatus = 'available' | 'discounted' | 'failed' | 'closed';
+
+export type SupplierOffer = {
+  productId: string;
+  amount: number;
+  normalUnitCost: number;
+  discountUnitCost: number;
+  bulkUnitCost: number;
+  status: SupplierOfferStatus;
+  message: string;
+};
+
+export type SupplierChoice = 'buy' | 'negotiate' | 'bulk' | 'decline';
 
 export type DayMetrics = {
   totalCustomers: number;
@@ -76,6 +110,9 @@ export type GameState = {
   audio: { master: number; music: number; sfx: number; muted: boolean };
   settings: { quality: Quality };
   completedDays: number[];
+  market: MarketState;
+  supplierOffer: SupplierOffer | null;
+  hasSeenDay2Update: boolean;
 };
 
 export type Quote = { full: number; smallDiscount: number; customerOffer: number; cost: number };
