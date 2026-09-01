@@ -51,9 +51,14 @@ button,input,select { font:inherit; } button { cursor:pointer; } button:disabled
 .update-layer { position:fixed; z-index:120; inset:0; display:grid; place-items:center; overflow:auto; padding:16px; background:radial-gradient(circle at 50% 0,#4d3b1fdd,#070907f0 68%); backdrop-filter:blur(8px); }.update-card { width:min(620px,100%); padding:clamp(20px,4vw,35px); border:2px solid #cb9d4c; border-radius:22px; background:linear-gradient(145deg,#29281c,#10150e); box-shadow:0 25px 80px #000; text-align:center; }.update-card h2 { margin:5px 0; color:#ffe29b; font-size:clamp(29px,5vw,44px); }.update-card>p:not(.eyebrow) { margin:0 0 15px; color:#d7cfbd; }.update-features { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:14px 0; text-align:right; }.update-features article { display:flex; gap:8px; align-items:center; padding:9px; border:1px solid #ffffff19; border-radius:9px; background:#ffffff08; animation:update-in .3s both ease-out; }.update-features article>span { font-size:27px; }.update-features b,.update-features small { display:block; }.update-features b { color:#ffe1a0; font-size:12px; }.update-features small { margin-top:2px; color:#bbb4a2; font-size:9px; line-height:1.35; }.update-card .reset-link { margin:9px auto 0; max-width:200px; }
 @keyframes update-in { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
 
-/* On a portrait phone, keep the original landscape board intact and scale it
-   into the viewport. There is deliberately no rotation prompt or vertical UI. */
+/* Portrait fallback: keep the board horizontal and fill the screen. There is
+   no rotate prompt, no page-sized empty area, and no vertical game layout. */
 @media (max-width:900px) and (orientation:portrait) {
-  .dokan-app { display:grid; min-height:100dvh; height:100dvh; padding:0; place-items:center; overflow:hidden; }
-  .game-shell { width:900px; height:506.25px; max-width:none; margin:0; transform:scale(min(calc(100vw / 900px),calc(100dvh / 506.25px))); transform-origin:center; }
+  .dokan-app { display:block; min-height:100dvh; height:100dvh; padding:4px; overflow:hidden; }
+  .game-shell { width:100%; height:calc(100dvh - 8px); max-width:none; margin:0; transform:none; }
+  .topbar { grid-template-columns:repeat(6,minmax(0,1fr)); }
+  .game-board { grid-template-columns:minmax(0,27%) minmax(0,43%) minmax(0,30%); }
+  .left-column { grid-template-rows:minmax(0,1fr); }
+  .objective-panel { display:none; }
+  .left-column,.main-scene,.right-column,.scene-frame { min-width:0; }
 }

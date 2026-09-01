@@ -29,8 +29,13 @@ export default function Home() {
     return () => window.removeEventListener('keydown', onKey);
   }, []);
 
+  const beginGame = () => {
+    setStarted(true);
+    void requestLandscapeOnTouchDevice();
+  };
+
   if (!dokan.hydrated) return <main className="dokan-app loading-screen"><span>🏪</span><p>يتم تجهيز دكان زمان…</p></main>;
-  if (!started) return <main className="dokan-app"><StartScreen saved={dokan.hasSavedGame} onStart={() => setStarted(true)} onReset={() => setConfirmReset(true)} />{confirmReset && <ResetConfirm onCancel={() => setConfirmReset(false)} onConfirm={() => { dokan.restart(); setConfirmReset(false); setStarted(true); }} />}</main>;
+  if (!started) return <main className="dokan-app"><StartScreen saved={dokan.hasSavedGame} onStart={beginGame} onReset={() => setConfirmReset(true)} />{confirmReset && <ResetConfirm onCancel={() => setConfirmReset(false)} onConfirm={() => { dokan.restart(); setConfirmReset(false); beginGame(); }} />}</main>;
 
   const current = game.currentCustomer;
   const progress = game.metrics.served + game.metrics.left;
@@ -104,6 +109,19 @@ export default function Home() {
     {modal === 'guide' && <Modal title="طريقة اللعب" close={() => setModal(null)}><Guide day={game.day} /></Modal>}
     {modal === 'supplier' && game.supplierOffer && <Modal title="مورد اليوم" close={() => setModal(null)}><SupplierPanel game={game} onAction={(choice) => { dokan.negotiateSupplier(choice); if (choice !== 'negotiate') setModal(null); }} /></Modal>}
   </main>;
+}
+
+async function requestLandscapeOnTouchDevice() {
+  if (!window.matchMedia('(pointer: coarse)').matches) return;
+  const orientation = window.screen.orientation as ScreenOrientation & { lock?: (mode: 'landscape') => Promise<void> };
+  if (!orientation?.lock) return;
+
+  try {
+    if (document.fullscreenEnabled && !document.fullscreenElement) await document.documentElement.requestFullscreen();
+    await orientation.lock('landscape');
+  } catch {
+    // Some mobile browsers do not expose orientation locking. CSS keeps the board usable there.
+  }
 }
 
 function StartScreen({ saved, onStart, onReset }: { saved: boolean; onStart: () => void; onReset: () => void }) {
